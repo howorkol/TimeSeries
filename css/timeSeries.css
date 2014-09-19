@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+}
+
+div.slide {
+    width: 100%;
+    height: 100%;
+    background-color: #353535;
+}
+
+h2.selected + div > div.slide {
+    background-color: #555555;
+}
+/*
+h2 span, div.slide {
+    -moz-transition: background-color 0.3s;
+    -o-transition: background-color 0.3s;
+    -webkit-transition: background-color 0.3s;
+    transition: background-color 0.3s;
+}*/
