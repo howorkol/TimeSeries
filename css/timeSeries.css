@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    font-family: sans-serif;
 }
 
 div.slide {
@@ -11,6 +12,42 @@ div.slide {
 h2.selected + div > div.slide {
     background-color: #555555;
 }
+
+form#searchBox {
+    width:500px;
+    margin: auto;
+    color: #141414;
+    padding-top: 200px;
+    background-color: transparent;
+}
+
+form#searchBox h1 {
+    color: #141414;
+    margin-bottom: 25px;
+    font-size: 2.1em;
+}
+
+input#text, input#button {
+    font-size: 1.3em;
+}
+
+input#text {
+    padding: 8px 15px;
+    background: #414141;
+}
+
+input#button {
+    position: relative;
+    padding: 6px 15px;
+    left: -8px;
+    border: 2px solid #313131;
+    background-color: #313131;
+}
+
+input#button:hover  {
+    background-color: #555555;
+}
+
 /*
 h2 span, div.slide {
     -moz-transition: background-color 0.3s;

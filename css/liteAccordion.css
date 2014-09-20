@@ -89,7 +89,7 @@
     box-shadow: 0 -1px 0 #5b5b5b inset, 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 .liteAccordion.dark .slide > h2 { background: #030303; text-shadow: 0 -1px 0 #030303; line-height: 41px }
-.liteAccordion.dark .slide > h2 span { background: #353535; color: white }
+.liteAccordion.dark .slide > h2 span { background: #353535; color: black }
 .liteAccordion.dark .slide > h2 b { background: #353535; color: #030303; text-shadow: -1px 1px 0 #5b5b5b }
 .liteAccordion.dark .slide > h2.selected span, .liteAccordion.dark .slide > h2.selected span:hover {
     background: #353535;
