@@ -13,7 +13,7 @@
     <li>
         <h2><span class='slide_title'>Start</span></h2>
         <div class='slide_cont' id='start'>
-        <div class='slide'>
+        <div class='page'>
             <form id='searchBox' autocomplete='off'>
                 <h1>Search for a company to begin</h1>
                 <input id='text' type="text" placeholder="Search...">
@@ -22,20 +22,39 @@
         </div>
         </div>
     </li>
+        
     <li>
         <h2><span class='slide_title' id='viz_slide'>Visulaizations</span></h2>
         <div class='slide_cont' id='viz'>
-        <div class='slide'>
-            <div id='head_sec'><h1 id='comp_name'>Company Name</h1></div>
-            <div id='viz_cont'></div>
-            <div id='legend_cont'></div>
+        <div class='page'>
+            <div class='page_top'><h1>
+                <span class='company_name'>Company Name</span>&nbsp;|
+                <span class='company_perc'>0.00</span>%
+            </h1></div>
+            <div class='viz_cont'></div>
+            <div class='legend_cont'></div>
         </div>
         </div>
     </li>
+        
     <li>
         <h2><span class='slide_title'>Company Info</span></h2>
         <div class='slide_cont' id='info'>
-        <div class='slide'></div>
+        <div class='page'>
+            <div class='page_top'>
+                <div id='compare_cont'>
+                    <p>Compare</p>
+                    <div class='selected' id='comp_attr'>Attributes</div>
+                    <div id='comp_comp'>Companies</div>
+                </div>
+                <h1>
+                    <span class='company_name'></span>&nbsp;|
+                    <span class='company_perc'>0.00</span>%
+                </h1>
+            </div>
+            <div class='viz_cont'></div>
+            <div class='legend_cont'></div>
+        </div>
         </div>
     </li>
     </ol>

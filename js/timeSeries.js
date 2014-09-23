@@ -14,18 +14,34 @@ $('form#searchBox').submit(function() {
 });
 
 $('#searchBox > input#button').click(function() {
-    var text = $('#searchBox > input#text').val();
-    if (text === '') return false;
+    var search_term = $('#searchBox > input#text').val();
+    if (search_term === '') return false;
     
-    disable_slides = false;
+    get_data(search_term, function() {
+        disable_slides = false;
     
-    $('#comp_name').text(text);
-    $('#viz_slide').click();
-    
-    $('#searchBox > input#text').val('');
+        $('.company_name').text(search_term);
+        $('#viz_slide').click();
+
+        $('#searchBox > input#text').val('');
+    });
 });
 
 $('span.slide_title').click(function(e) {
     if (disable_slides === true)
         return false;
 });
+
+$('div#compare_cont > div').click(function() {
+    if (!$(this).hasClass('selected')) {
+        $('div#compare_cont > div').toggleClass('selected');
+    }
+
+    
+});
+
+function get_data(search_term, callback) {
+    callback();
+}
+    
+

@@ -1,16 +1,17 @@
 body {
     margin: 0;
     font-family: sans-serif;
+    color: rgba(0, 0, 0, 0.60);
 }
 
-div.slide {
+div.page {
     width: 100%;
     height: 100%;
     border: 1px solid #909090;
     background-color: #ededed;
 }
 
-h2.selected + div > div.slide {
+h2.selected + div > div.page {
     background-color: #ffffff;
 }
 
@@ -24,7 +25,6 @@ form#searchBox {
 }
 
 h1 {
-    color: rgba(0, 0, 0, 0.60);
     font-size: 40px;
 }
 
@@ -39,49 +39,87 @@ input#text, input#button {
 
 input#text {
     padding: 8px 15px;
-    background: rgba(0, 0, 0, 0.12);
 }
 
 input#button {
     position: relative;
     padding: 8px 15px;
     left: -4px;
-    background: rgba(0, 0, 0, 0.24);
 }
 
-input#button:hover  {
+input#text, div#compare_cont > div {
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+input#button, div#compare_cont > div:hover {
+    background-color: rgba(0, 0, 0, 0.24);
+}
+
+input#button:hover, div#compare_cont > div.selected {
     background-color: rgba(0, 0, 0, 0.36);
 }
 
-input#button:active  {
+input#button:active {
     background-color: rgba(0, 0, 0, 0.48);
 }
 
-div#head_sec {
-    background-color: transparent;
-    width: 100%;
-    height: 60px;
+div.page > div {
+    margin: 5px;
 }
 
-div#head_sec h1 {
+div.page div.page_top {
+    height: 75px;
+}
+
+div.viz_cont, div.legend_cont, div#compare_cont > div {
+    display: inline-block;
+}
+
+div.page div.viz_cont, div.page div.legend_cont {
+    height: calc(100% - 91px);
+    margin-top: 0;
+}
+
+div.page div.viz_cont {
+    width: calc(100% - 196px);
+    float: left;
+}
+
+div.page div.legend_cont {
+    margin-left: 0;
+    width: 180px;
+}
+
+div.page div.page_top h1 {
+    font-size: 3.2em;
     padding-left: 15px;
-    line-height: 60px;
+    line-height: 75px;
 }
 
-div#viz_cont, div#legend_cont {
-    height: calc(100% - 60px - 7px);
-    top: 60px;
-    background-color: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.36);
+div#compare_cont {
+    float: right;
+    width: 180px;
+    height: 75px;
 }
 
-div#viz_cont {
-    width: calc(80% - 24px - 10px);
+div#compare_cont > p {
+    font-size: 1.5em;
 }
 
-div#legend_cont {
-    width: calc(20% - 24px - 10px);
-    right: 5px;
+div#compare_cont > p, div#compare_cont > div {
+    height: 50%;
+    line-height: 37.5px;
+}
+
+div#compare_cont > div {
+    width: 50%;
+    font-size: 1em;
+    text-align: center;
+    cursor: default;
+}
+
+div#compare_cont #comp_attr {
+    float: left;
 }
 
 /*h2 span, div.slide {
