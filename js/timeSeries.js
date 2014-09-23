@@ -1,5 +1,12 @@
 var chart_count = 0;
 var disable_slides = true;
+var company_list = [];
+var attribute_list = [];
+var data = {
+    // attribute: {
+    //     company: data_series
+    // }
+}
 
 $('#accordion_cont').liteAccordion({
     containerWidth: $(window).width() - 23,
@@ -42,38 +49,49 @@ function get_data(search_term, option, callback) {
     var chart_height = 0;
     
     if (option === 'add_company') {
+        company_list.push(search_term);
+        
         if (chart_count === 0) {
+            attribute_list.push('initial attr');
+            
             // Get data from Quandl.
             chart_count += 1;
             chart_height = update_chart_height(chart_count);
-            initial_chart(null, chart_height, callback);
+            add_attribute(chart_height, callback);
         } else {
             // Get data from Quandl.
-            add_company(null, callback);
+            add_company(callback);
         }
     } else if (option === 'add_attribute') {
+        attribute_list.push(search_term);
+        
         // Get data from Quandl.
         chart_count += 1;
         chart_height = update_chart_height(chart_count);
-        add_attribute(null, chart_height, callback);
+        add_attribute(chart_height, callback);
     }
 }
 
-function initial_chart(data, chart_height, callback) {
-    
+
+
+
+function add_company(company, callback) {
+    // Go through each chart and add this company to it.
 
     callback();
 }
 
-function add_company(data, callback) {
-    callback();
-}
-
-function add_attribute(data, chart_height, callback) {
-    
+function add_attribute(attribute, chart_height, callback) {
+    // Create a new chart and add each company to it.
 
     callback();
 }
+
+
+
+
+
+
 
 function update_chart_height(chart_count) {
     var chart_height = $('#viz div.viz_cont').height();
