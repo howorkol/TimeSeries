@@ -10,11 +10,60 @@ var data = {
     // }
 }
 
+var total = 0;
+
 $('#accordion_cont').liteAccordion({
     containerWidth: $(window).width() - 23,
     containerHeight: $(window).height() - 13,
     slideSpeed: 1000,
     theme : 'light'
+});
+
+$('div#visualizations ul').sortable({
+    'disabled': true,
+    'start': function(e, ui) {
+        $('i#trash').removeClass('hidden');
+    },
+    'sort': function(e) {
+        var trash = $('i#trash').offset();
+        trash.width = $('i#trash').width();
+        trash.height = $('i#trash').height();
+        
+        if ((e.pageX >= trash.left) 
+                && (e.pageX <= (trash.left + trash.width))
+                && (e.pageY >= trash.top)
+                && (e.pageY <= (trash.top + trash.height))) {
+            
+            $('i#trash').removeClass('fa-trash');
+            $('i#trash').addClass('fa-trash-o');
+        } else {
+            $('i#trash').removeClass('fa-trash-o');
+            $('i#trash').addClass('fa-trash');
+        }
+    },
+    'stop': function(e, ui) {
+        var trash = $('i#trash').offset();
+        trash.width = $('i#trash').width();
+        trash.height = $('i#trash').height();
+        
+        if ((e.pageX >= trash.left) 
+                && (e.pageX <= (trash.left + trash.width))
+                && (e.pageY >= trash.top)
+                && (e.pageY <= (trash.top + trash.height))) {
+            
+            // Remove the element
+            delete_attribute(ui.item, ui.item.children().attr('id'))
+            
+            // If there is only one attribute left, disable sorting.
+            if (attribute_list.length == 1) {
+                $('div#visualizations ul').sortable('option', 'disabled', true);
+            }
+        }
+    
+        $('i#trash').addClass('hidden');
+        $('i#trash').removeClass('fa-trash-o');
+        $('i#trash').addClass('fa-trash');
+    }
 });
 
 $('form#searchBox').submit(function () {
@@ -48,15 +97,13 @@ $('div#compare_cont > div').click(function () {
 });
 
 $('input#add').click(function() {
-    chart_count += 1;
-    chart_height = update_chart_height(chart_count);
-    add_attribute('new' + chart_count, chart_height, function() {
+    attribute_list.push('new' + chart_count);
+    add_attribute('new' + chart_count, function() {
         
     });
 });
 
 function get_data(search_term, option, callback) {
-    var chart_height = 0;
     
     if (option === 'add_company') {
         company_list.push(search_term);
@@ -66,9 +113,7 @@ function get_data(search_term, option, callback) {
             attribute_list.push(new_attr);
             
             // Get data from Quandl.
-            chart_count += 1;
-            chart_height = update_chart_height(chart_count);
-            add_attribute(new_attr, chart_height, callback);
+            add_attribute(new_attr, callback);
         } else {
             // Get data from Quandl.
             add_company('Google', callback);
@@ -77,9 +122,7 @@ function get_data(search_term, option, callback) {
         attribute_list.push(search_term);
         
         // Get data from Quandl.
-        chart_count += 1;
-        chart_height = update_chart_height(chart_count);
-        add_attribute(chart_height, callback);
+        add_attribute(search_term, callback);
     }
 }
 
@@ -90,27 +133,45 @@ function add_company(company, callback) {
     callback();
 }
 
-function add_attribute(attribute, chart_height, callback) {
+function add_attribute(attribute, callback) {
     // Create a new chart and add each company to it.
-    var svg = d3.select('div#visualizations')
+    chart_count += 1;
+    total += 1;
+    chart_height = update_chart_height();
+    
+    var svg = d3.select('div#visualizations ul')
+        .append('li')
         .append('svg')
         .attr('class', 'chart')
         .attr('id', attribute)
         .attr('position', chart_count - 1)
-        .attr('width', $('div#visualizations').width())
         .attr('height', chart_height);
     
     svg.append('rect')
-        .attr('width', $('div#visualizations').width())
+        .attr('width', $('div#visualizations svg').width())
         .attr('height', chart_height)
         .attr('fill', function() {
-            return 'rgb(' + ((chart_count - 1) * 10) + ',0,0)';
+            return 'rgb(' + ((total- 1) * 10) + ',0,0)';
         });
-
+    
+    if (attribute_list.length > 1) {
+        $('div#visualizations ul').sortable('option', 'disabled', false);
+    }
+    
     callback();
 }
 
-function update_chart_height(chart_count) {
+function delete_attribute(li_element, chart_id) {
+    li_element.remove();
+    var i = attribute_list.indexOf(chart_id);
+    attribute_list.splice(i, 1);
+    
+    chart_count -= 1;
+    total -= 1;
+    chart_height = update_chart_height();
+}
+
+function update_chart_height() {
     var total_height = $('div#visualizations').height();
     
     // Calculate the new chart height.
@@ -118,13 +179,12 @@ function update_chart_height(chart_count) {
             ? total_height / chart_count
             : min_chart_height;
     
-    // Go through all existing charts and make them the new height.
-    // The y position needs to be updated as well.
-    d3.selectAll('svg.chart rect')
+    // Resize each svg element to fit the resized chart.
+    d3.selectAll('svg.chart')
         .attr('height', chart_height);
     
-    // Resize the svg element to fit everything.
-    d3.selectAll('svg.chart')
+    // Go through all existing charts and make them the new height.
+    d3.selectAll('svg.chart rect')
         .attr('height', chart_height);
     
     return chart_height;

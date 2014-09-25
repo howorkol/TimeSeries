@@ -89,6 +89,7 @@ div.slide_container div.main_div {
 div.slide_container div.secondary_div {
     margin-left: 0;
     width: 180px;
+    position: relative;
 }
 
 div.slide_container div.page_top h1 {
@@ -130,6 +131,27 @@ input#add {
 svg {
     width: 100%;
 }
+
+svg rect {
+    stroke-width: 1px;
+    stroke: white;
+}
+
+li.ui-sortable-helper svg rect {
+    fill-opacity: 0.5;
+}
+
+i.fa {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+i.fa.hidden {
+    display: none;
+}
+
+
 
 /*h2 span, div.slide {
     -moz-transition: background-color 0.3s;
