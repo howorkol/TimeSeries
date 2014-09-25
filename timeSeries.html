@@ -12,8 +12,8 @@
     <ol>
     <li>
         <h2><span class='slide_title'>Start</span></h2>
-        <div class='slide_cont' id='start'>
-        <div class='page'>
+        <div>
+        <div class='slide_container' id='start_slide'>
             <form id='searchBox' autocomplete='off'>
                 <h1>Search for a company to begin</h1>
                 <input id='text' type="text" placeholder="Search...">
@@ -24,23 +24,26 @@
     </li>
         
     <li>
-        <h2><span class='slide_title' id='viz_slide'>Visulaizations</span></h2>
-        <div class='slide_cont' id='viz'>
-        <div class='page'>
-            <div class='page_top'><h1>
-                <span class='company_name'>Company Name</span>&nbsp;|
-                <span class='company_perc'>0.00</span>%
-            </h1></div>
-            <div class='viz_cont'></div>
-            <div class='legend_cont'></div>
+        <h2><span class='slide_title'>Visulaizations</span></h2>
+        <div>
+        <div class='slide_container' id='visulaization_slide'>
+            <div class='page_top'>
+                <input id='add' type="button" value="Add Attribute">
+                <h1>
+                    <span class='company_name'>Company Name</span>&nbsp;|
+                    <span class='company_perc'>0.00</span>%
+                </h1>
+            </div>
+            <div class='main_div' id='visualizations'><svg></svg></div>
+            <div class='secondary_div' id='legend'></div>
         </div>
         </div>
     </li>
         
     <li>
         <h2><span class='slide_title'>Company Info</span></h2>
-        <div class='slide_cont' id='info'>
-        <div class='page'>
+        <div>
+        <div class='slide_container' id='info_slide'>
             <div class='page_top'>
                 <div id='compare_cont'>
                     <p>Compare</p>
@@ -48,12 +51,12 @@
                     <div id='comp_comp'>Companies</div>
                 </div>
                 <h1>
-                    <span class='company_name'></span>&nbsp;|
+                    <span class='company_name'>Company Name</span>&nbsp;|
                     <span class='company_perc'>0.00</span>%
                 </h1>
             </div>
-            <div class='viz_cont'></div>
-            <div class='legend_cont'></div>
+            <div class='main_div'></div>
+            <div class='secondary_div'></div>
         </div>
         </div>
     </li>
@@ -62,6 +65,7 @@
     
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <script src="js/liteAccordion.jquery.min.js" type="text/javascript"></script>
+    <script src="js/d3.v3.min.js" type="text/javascript"></script>
     <script src="js/timeSeries.js" type="application/javascript"></script>
 </body>
 </html>
