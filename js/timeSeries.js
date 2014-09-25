@@ -1,5 +1,7 @@
 var chart_count = 0;
 var disable_slides = true;
+var min_chart_height = 150;
+
 var company_list = [];
 var attribute_list = [];
 var data = {
@@ -81,9 +83,6 @@ function get_data(search_term, option, callback) {
     }
 }
 
-
-
-
 function add_company(company, callback) {
     // Go through each chart and add this company to it.
     console.log(chart_count);
@@ -93,18 +92,19 @@ function add_company(company, callback) {
 
 function add_attribute(attribute, chart_height, callback) {
     // Create a new chart and add each company to it.
-    var rect = d3.select('div#visualizations svg')
-        .append('rect')
+    var svg = d3.select('div#visualizations')
+        .append('svg')
         .attr('class', 'chart')
         .attr('id', attribute)
         .attr('position', chart_count - 1)
         .attr('width', $('div#visualizations').width())
+        .attr('height', chart_height);
+    
+    svg.append('rect')
+        .attr('width', $('div#visualizations').width())
         .attr('height', chart_height)
-        .attr('stroke', 'black')
-        .attr('stroke-width', 1)
-        .attr('y', chart_height * (chart_count - 1))
         .attr('fill', function() {
-            return 'rgb(0,0,' + ((chart_count - 1) * 10) + ')';
+            return 'rgb(' + ((chart_count - 1) * 10) + ',0,0)';
         });
 
     callback();
@@ -114,21 +114,18 @@ function update_chart_height(chart_count) {
     var total_height = $('div#visualizations').height();
     
     // Calculate the new chart height.
-    chart_height = ((total_height / chart_count) > 200)
+    chart_height = ((total_height / chart_count) > min_chart_height)
             ? total_height / chart_count
-            : 200;
+            : min_chart_height;
     
     // Go through all existing charts and make them the new height.
     // The y position needs to be updated as well.
-    d3.selectAll('rect.chart')
-        .attr('height', chart_height)
-        .attr('y', function() {
-            return $(this).attr('position') * chart_height;
-        });
+    d3.selectAll('svg.chart rect')
+        .attr('height', chart_height);
     
     // Resize the svg element to fit everything.
-    d3.select('svg')
-        .attr('height', chart_height * chart_count);
+    d3.selectAll('svg.chart')
+        .attr('height', chart_height);
     
     return chart_height;
 }
