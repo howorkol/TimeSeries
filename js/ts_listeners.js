@@ -39,7 +39,7 @@ $('div#visualizations ul').sortable({
                 && (e.pageY <= (trash.top + trash.height))) {
             
             // Remove the element
-            delete_attribute(ui.item, ui.item.children().attr('id'))
+            delete_attribute(ui.item, ui.item.attr('id'));
             
             // If there is only one attribute left, disable sorting.
             if (attribute_list.length == 1) {
@@ -93,11 +93,17 @@ $('div#compare_cont > div').click(function () {
 });
 
 $('input#add').click(function() {
-    add_attribute(total + 1, function(err) {});
+    add_attribute((total + 1).toString(), function(err) {});
     //add_company('b', function(err) {});
 });
 
 $('input#add_c').click(function() {
     //add_attribute(total + 1, function(err) {});
     add_company('b', function(err) {});
+});
+
+$('input#add_r').click(function() {
+    //add_attribute(total + 1, function(err) {});
+    //add_company('b', function(err) {});
+    delete_company('b', function(err) {});
 });

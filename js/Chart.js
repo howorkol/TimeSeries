@@ -18,6 +18,7 @@ Chart.prototype.make_chart = function() {
     
     this.svg = d3.select(this.chart_container)
         .append('li')
+        .attr('id', this.attribute)
         .append('svg')
         .attr('width',  $(this.chart_container).width())
         .attr('height', this.height);
@@ -38,6 +39,7 @@ Chart.prototype.make_chart = function() {
     this.yAxis = d3.svg.axis().scale(this.y).orient('left');
     
     var line = d3.svg.line()
+        .defined(function(d) { return d[1] != null; })
         .x(function(d) { return x(d[0]); })
         .y(function(d) { return y(d[1]); });
     

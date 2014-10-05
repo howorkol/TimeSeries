@@ -65,8 +65,9 @@ function add_company(company_name, callback) {
             data.data.forEach(function(d) {
                 d[0] = parseDate(d[0]);
                 for (var i = 1; i <= attribute_list.length; i++) {
-                    if (d[i] != '')
+                    if (d[i] !== null) {
                         d[i] = +d[i];
+                    }
                 }
             });
             
@@ -88,8 +89,22 @@ function add_company(company_name, callback) {
     
 }
 
-function delete_company() {
+function delete_company(company_name, callback) {
+    var i = company_list.indexOf(company_name);
     
+    // If the company isn't in company list, callback() with err.
+    if (i == -1) {
+        callback('err');
+        return;
+    }
+    
+    // Go through the data structure and delete data from this company.
+    for (var j in attribute_list) {
+        delete comp_data[attribute_list[j]][company_name];
+    }
+    
+    // Remove the company from company_list.
+    company_list.splice(i, 1);
 }
 
 function add_attribute(attr_name, callback) {
@@ -110,8 +125,9 @@ function add_attribute(attr_name, callback) {
         data.data.forEach(function(d) {
             d[0] = parseDate(d[0]);
             for (var i = 1; i <= company_list.length; i++) {
-                if (d[i] != '')
+                if (d[i] !== null) {
                     d[i] = +d[i];
+                }
             }
         });
         
