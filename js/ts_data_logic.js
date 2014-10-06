@@ -5,11 +5,11 @@ var min_chart_height = 150;
 var company_list;
 var attribute_list;
 var color_list = [
-    'red', 'blue', 'green', 'steelblue'
+    '#5DA5DA', '#FAA43A', '#60BD68', '#F17CB0', '#B276B2', '#DECF3F', '#F15854'
 ];
 var comp_data;
 var charts = {};
-var query_part = 'https://quandl.com/api/v1/multisets.json?columns=';
+var query_part = 'https://quandl.com/api/v1/multisets.json?collapse=monthly&columns=';
 var auth_token = '&auth_token=WczNwgPepRcbZR9Yf7qt';
 
 var parseDate = d3.time.format("%Y-%m-%d").parse;
@@ -19,7 +19,12 @@ var total = 0;
 
 function add_company(company_name, callback) {
     
+    var new_p = '<p class="company" style="color: '
+            + 'blue' + '">' + company_name;
+    
     if (attribute_list.length == 0) {
+        total = 1;
+    
         // This is the first attribute to be added.
         // Build the query to send to Quandl
         var query = query_part;
@@ -27,7 +32,10 @@ function add_company(company_name, callback) {
         
         // Query Quandl
         d3.json(query, function(err, data) {
-            if (err) callback(err);
+            if (err) {
+                callback(err);
+                return;
+            }
             
             // Go thru the response. Parse the date and value.
             data.data.forEach(function(d) {
@@ -44,7 +52,10 @@ function add_company(company_name, callback) {
             //chart_height = update_chart_height();
             //make_chart(init_attribute, callback);
             charts[init_attribute] = new Chart(init_attribute);
+            
+            $('div#visulaization_slide div.secondary_div').append(new_p + '</p>');
             total++;
+            
             callback();
         });
     } else {
@@ -59,7 +70,10 @@ function add_company(company_name, callback) {
         
         // Query Quandl
         d3.json(query, function(err, data) {
-            if (err) callback(err);
+            if (err) {
+                callback(err);
+                return;
+            }
             
             // Go thru the response. Parse the date and value.
             data.data.forEach(function(d) {
@@ -83,10 +97,21 @@ function add_company(company_name, callback) {
             for (chart in charts) {
                 charts[chart].update_chart_lines();
             }
-            callback()
+        
+            new_p += '<i id="' + company_name + '" class="fa fa-times"></i></p>';
+            $('div#visulaization_slide div.secondary_div').append(new_p);
+            
+            $('p.company i#' + company_name).click(function() {
+                var comp = $(this).attr('id');
+            
+                delete_company(comp, function() {
+                    $('p.company i#' + comp).parent().remove();
+                });
+            });
+            
+            callback();
         });
     }
-    
 }
 
 function delete_company(company_name, callback) {
@@ -94,7 +119,7 @@ function delete_company(company_name, callback) {
     
     // If the company isn't in company list, callback() with err.
     if (i == -1) {
-        callback('err');
+        //callback('err');
         return;
     }
     
@@ -105,6 +130,8 @@ function delete_company(company_name, callback) {
     
     // Remove the company from company_list.
     company_list.splice(i, 1);
+    
+    callback();
 }
 
 function add_attribute(attr_name, callback) {

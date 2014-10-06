@@ -6,7 +6,7 @@ var Chart = function(attribute) {
 
 Chart.prototype.chart_container = 'div#visualizations ul';
 Chart.prototype.min_chart_height = 150;
-Chart.prototype.margin = {top: 20, right: 25, bottom: 20, left: 65};
+Chart.prototype.margin = {top: 20, right: 12, bottom: 20, left: 65};
 Chart.prototype.width = $(Chart.prototype.chart_container).width() 
         - Chart.prototype.margin.left - Chart.prototype.margin.right;
 Chart.prototype.height;
@@ -43,6 +43,14 @@ Chart.prototype.make_chart = function() {
         .x(function(d) { return x(d[0]); })
         .y(function(d) { return y(d[1]); });
     
+    for (c in comp_data[this.attribute]) {
+        this.chart_group.append("path")
+            .datum(comp_data[this.attribute][c])
+            .attr("class", "line")
+            .attr("d", line)
+            .attr('stroke', 'blue');
+    }
+    
     // X Axis
     this.chart_group.append('g')
         .attr('class', 'x axis')
@@ -59,14 +67,6 @@ Chart.prototype.make_chart = function() {
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
         .text(this.attribute);
-    
-    for (c in comp_data[this.attribute]) {
-        this.chart_group.append("path")
-            .datum(comp_data[this.attribute][c])
-            .attr("class", "line")
-            .attr("d", line)
-            .attr('stroke', 'blue');
-    }
 }
 
 Chart.prototype.update_chart_height = function() {

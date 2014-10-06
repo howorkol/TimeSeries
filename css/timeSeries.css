@@ -141,14 +141,24 @@ li.ui-sortable-helper svg rect {
     fill-opacity: 0.5;
 }
 
-i.fa {
+i#trash {
     position: absolute;
     bottom: 0;
     right: 0;
 }
 
-i.fa.hidden {
+i#trash.hidden {
     display: none;
+}
+
+p.company i.fa-times {
+    position: absolute;
+    right: 0;
+    color: rgba(0, 0, 0, 0.48);
+}
+
+p.company i.fa-times:hover {
+    color: rgba(0, 0, 0, 0.24);
 }
 
 
