@@ -151,6 +151,11 @@ i#trash.hidden {
     display: none;
 }
 
+p.company {
+    font-size: 30px;
+    padding: 5px;
+}
+
 p.company i.fa-times {
     position: absolute;
     right: 0;
@@ -160,6 +165,7 @@ p.company i.fa-times {
 p.company i.fa-times:hover {
     color: rgba(0, 0, 0, 0.24);
 }
+
 
 
 

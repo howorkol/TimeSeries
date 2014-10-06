@@ -6,7 +6,7 @@ var Chart = function(attribute) {
 
 Chart.prototype.chart_container = 'div#visualizations ul';
 Chart.prototype.min_chart_height = 150;
-Chart.prototype.margin = {top: 20, right: 12, bottom: 20, left: 65};
+Chart.prototype.margin = {top: 5, right: 12, bottom: 5, left: 65};
 Chart.prototype.width = $(Chart.prototype.chart_container).width() 
         - Chart.prototype.margin.left - Chart.prototype.margin.right;
 Chart.prototype.height;
@@ -48,14 +48,14 @@ Chart.prototype.make_chart = function() {
             .datum(comp_data[this.attribute][c])
             .attr("class", "line")
             .attr("d", line)
-            .attr('stroke', 'blue');
+            .attr('stroke', used_colors[c]);
     }
-    
+    /*
     // X Axis
     this.chart_group.append('g')
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,' + chart_height + ')')
-        .call(this.xAxis);
+        .call(this.xAxis);*/
     
     // Y Axis
     this.chart_group.append('g')
@@ -70,11 +70,23 @@ Chart.prototype.make_chart = function() {
 }
 
 Chart.prototype.update_chart_height = function() {
-    this.svg.transition()
-        .duration(500)
+    var y = this.y.range([this.height - this.margin.top - this.margin.bottom, 0]);
+    var x = this.x;
+    
+    var line = d3.svg.line()
+        .defined(function(d) { return d[1] != null; })
+        .x(function(d) { return x(d[0]); })
+        .y(function(d) { return y(d[1]); });
+    
+    this.svg
+        .transition().duration(500)
         .attr('height', this.height);
-    
-    
+    this.chart_group.select('.y')
+        .transition().duration(500)
+        .call(this.yAxis);
+    this.chart_group.selectAll('.line')
+        .transition().duration(500)
+        .attr('d', line);
 };
 
 Chart.prototype.update_chart_lines = function() {

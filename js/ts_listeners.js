@@ -39,12 +39,16 @@ $('div#visualizations ul').sortable({
                 && (e.pageY <= (trash.top + trash.height))) {
             
             // Remove the element
-            delete_attribute(ui.item, ui.item.attr('id'));
-            
-            // If there is only one attribute left, disable sorting.
-            if (attribute_list.length == 1) {
-                $('div#visualizations ul').sortable('option', 'disabled', true);
-            }
+            delete_attribute(ui.item, ui.item.attr('id'), function(err) {
+                if (err) {
+                    
+                } else {
+                    if (attribute_list.length == 1) {
+                        $('div#visualizations ul').sortable('option', 'disabled', true);
+                    }
+                }
+                
+            });
         }
     
         $('i#trash').addClass('hidden');
@@ -60,13 +64,18 @@ $('form#searchBox').submit(function () {
 
 $('#searchBox > input#button').click(function () {
     var search_term = $('#searchBox > input#text').val();
-    if (search_term === '') { return false; }
+    if (search_term === '') { 
+        // Output "must enter search term"
+        return false; 
+    }
     
+    // Reset everything from the visualizations.
     $('div#visualizations ul li').remove();
     $('p.company').remove();
     company_list = [];
     attribute_list = [];
     comp_data = {};
+    charts = {};
     
     $('div#visualizations ul').sortable('option', 'disabled', true);
     
@@ -92,6 +101,8 @@ $('div#compare_cont > div').click(function () {
     }
 });
 
+
+
 $('input#add').click(function() {
     add_attribute(total.toString(), function(err) {});
     //add_company('b', function(err) {});
@@ -99,5 +110,8 @@ $('input#add').click(function() {
 
 $('input#add_c').click(function() {
     //add_attribute(total + 1, function(err) {});
-    add_company('b', function(err) {});
+    var c = $('input#c_text').val();
+    //if (company_list.indexOf(c) < 0) return;
+    console.log(c);
+    add_company(c, function(err) {});
 });

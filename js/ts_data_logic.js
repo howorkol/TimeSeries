@@ -4,9 +4,10 @@ var chart_height;
 var min_chart_height = 150;
 var company_list;
 var attribute_list;
-var color_list = [
+var unused_color_list = [
     '#5DA5DA', '#FAA43A', '#60BD68', '#F17CB0', '#B276B2', '#DECF3F', '#F15854'
 ];
+var used_colors = {};
 var comp_data;
 var charts = {};
 var query_part = 'https://quandl.com/api/v1/multisets.json?collapse=monthly&columns=';
@@ -18,9 +19,6 @@ var total = 0;
 
 
 function add_company(company_name, callback) {
-    
-    var new_p = '<p class="company" style="color: '
-            + 'blue' + '">' + company_name;
     
     if (attribute_list.length == 0) {
         total = 1;
@@ -45,6 +43,7 @@ function add_company(company_name, callback) {
             
             attribute_list.push(init_attribute);
             company_list.push(company_name);
+            used_colors[company_name] = unused_color_list.shift();
             // Add the response data to the data structure.
             comp_data[init_attribute] = {};
             comp_data[init_attribute][company_name] = data.data;
@@ -53,10 +52,13 @@ function add_company(company_name, callback) {
             //make_chart(init_attribute, callback);
             charts[init_attribute] = new Chart(init_attribute);
             
-            $('div#visulaization_slide div.secondary_div').append(new_p + '</p>');
+            $('div#visulaization_slide div.secondary_div').append(
+                '<p class="company" style="color:' + used_colors[company_name]
+                    + '">' + company_name + '</p>'
+            );
             total++;
             
-            callback();
+            callback(null);
         });
     } else {
         // This is not the first company.
@@ -86,6 +88,7 @@ function add_company(company_name, callback) {
             });
             
             company_list.push(company_name);
+            used_colors[company_name] = unused_color_list.shift();
             // Add the response data to the data structure.
             for (var i in attribute_list) {
                 comp_data[attribute_list[i]][company_name] = 
@@ -97,10 +100,13 @@ function add_company(company_name, callback) {
             for (chart in charts) {
                 charts[chart].update_chart_lines();
             }
-        
-            new_p += '<i id="' + company_name + '" class="fa fa-times"></i></p>';
-            $('div#visulaization_slide div.secondary_div').append(new_p);
             
+            $('div#visulaization_slide div.secondary_div').append(
+                '<p class="company" style="color:' + used_colors[company_name]
+                    + '">' + company_name 
+                    + '<i id="' + company_name + '" class="fa fa-times"></i></p>'
+            );
+        
             $('p.company i#' + company_name).click(function() {
                 var comp = $(this).attr('id');
             
@@ -109,7 +115,7 @@ function add_company(company_name, callback) {
                 });
             });
             
-            callback();
+            callback(null);
         });
     }
 }
@@ -119,7 +125,7 @@ function delete_company(company_name, callback) {
     
     // If the company isn't in company list, callback() with err.
     if (i == -1) {
-        //callback('err');
+        callback('err');
         return;
     }
     
@@ -129,6 +135,8 @@ function delete_company(company_name, callback) {
     }
     
     // Remove the company from company_list.
+    unused_color_list.unshift(used_colors[company_name]);
+    delete used_colors[company_name];
     company_list.splice(i, 1);
     
     callback();
@@ -146,7 +154,10 @@ function add_attribute(attr_name, callback) {
     
     // Query Quandl.
     d3.json(query, function(err, data) {
-        if (err) callback(err);
+        if (err) {
+            callback(err);
+            return;
+        }
         
         // Go thru the response. Parse the date and value.
         data.data.forEach(function(d) {
@@ -176,7 +187,7 @@ function add_attribute(attr_name, callback) {
         $('div#visualizations ul').sortable('option', 'disabled', false);
         
         total++;
-        callback();
+        callback(null);
     });
     
 }
