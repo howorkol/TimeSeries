@@ -43,11 +43,10 @@ $('div#visualizations ul').sortable({
                 if (err) {
                     
                 } else {
-                    if (attribute_list.length == 1) {
+                    if (model.get_num_attributes() == 1) {
                         $('div#visualizations ul').sortable('option', 'disabled', true);
                     }
                 }
-                
             });
         }
     
@@ -69,14 +68,10 @@ $('#searchBox > input#button').click(function () {
         return false; 
     }
     
-    // Reset everything from the visualizations.
+    // Reset the model.
+    model = new Model();
     $('div#visualizations ul li').remove();
     $('p.company').remove();
-    company_list = [];
-    attribute_list = [];
-    comp_data = {};
-    charts = {};
-    
     $('div#visualizations ul').sortable('option', 'disabled', true);
     
     add_company(search_term, function(err) {
@@ -102,16 +97,11 @@ $('div#compare_cont > div').click(function () {
 });
 
 
-
 $('input#add').click(function() {
     add_attribute(total.toString(), function(err) {});
-    //add_company('b', function(err) {});
 });
 
 $('input#add_c').click(function() {
-    //add_attribute(total + 1, function(err) {});
     var c = $('input#c_text').val();
-    //if (company_list.indexOf(c) < 0) return;
-    console.log(c);
     add_company(c, function(err) {});
 });
