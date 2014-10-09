@@ -56,13 +56,13 @@ $('div#visualizations ul').sortable({
     }
 });
 
-$('form#searchBox').submit(function () {
-    $('#searchBox > input#button').click();
+$('form').submit(function() {
+    $(this).children().last().click();
     return false;
 });
 
-$('#searchBox > input#button').click(function () {
-    var search_term = $('#searchBox > input#text').val();
+$('form#searchBox > input.button').click(function () {
+    var search_term = $('form#searchBox > input.text').val();
     if (search_term === '') { 
         // Output "must enter search term"
         return false; 
@@ -81,7 +81,7 @@ $('#searchBox > input#button').click(function () {
             disable_slides = false;
             $('.company_name').text(search_term);
             $('ol li:nth-child(2) span').click();
-            $('#searchBox > input#text').val('');
+            $('form#searchBox > input.text').val('');
         }
     });
 });
@@ -101,7 +101,13 @@ $('input#add').click(function() {
     add_attribute(total.toString(), function(err) {});
 });
 
-$('input#add_c').click(function() {
-    var c = $('input#c_text').val();
-    add_company(c, function(err) {});
+$('div.secondary_div input.button').click(function() {
+    var c = $('div.secondary_div input.text').val();
+    add_company(c, function(err) {
+        if (err) {
+            
+        } 
+        
+        $('div.secondary_div input.text').val('');
+    });
 });

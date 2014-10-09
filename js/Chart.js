@@ -1,6 +1,6 @@
 var Chart = function(attribute) {
     this.attribute = attribute;
-    this.plotted_attributes = [];
+    this.plotted_companies = [];
     this.set_height();
     this.make_chart();
 };
@@ -46,9 +46,10 @@ Chart.prototype.make_chart = function() {
         this.chart_group.append("path")
             .datum(model.get_data(this.attribute, model.get_company_name(index)))
             .attr("class", "line")
+            .attr('id', model.get_company_name(index))
             .attr("d", Chart.prototype.line)
             .attr('stroke', model.get_color(model.get_company_name(index)));
-        this.plotted_attributes.push(model.get_company_name(index));
+        this.plotted_companies.push(model.get_company_name(index));
     }
     
     this.chart_group.append('g')
@@ -88,22 +89,43 @@ Chart.prototype.update_chart_lines = function() {
         .transition().duration(this.transition_dur)
         .attr('d', Chart.prototype.line);
 
-    var companies = model.get_company_list();
-    for (index in companies) {
-        if (this.plotted_attributes.indexOf(companies[index]) < 0) {
-            this.chart_group.append("path")
-                .datum(model.get_data(this.attribute, model.get_company_name(index)))
+    var companies = [];
+    $.each(model.get_company_list(), function(i, el) {
+        companies.push(el);
+    });
+    $.each(this.plotted_companies, function(i, el) {
+        if ($.inArray(el, companies) === -1) companies.push(el);
+    });
+    
+    var plotted_companies = this.plotted_companies;
+    var chart_group = this.chart_group;
+    var attribute = this.attribute;
+    var transition_dur = this.transition_dur;
+    
+    $.each(companies, function(i, el) {
+        if ($.inArray(el, plotted_companies) === -1) {
+            chart_group.append("path")
+                .datum(model.get_data(attribute, el))
                 .attr("class", "line")
+                .attr('id', el)
                 .attr("d", Chart.prototype.line)
-                .attr('stroke', model.get_color(model.get_company_name(index)))
+                .attr('stroke', model.get_color(el))
                 .attr('stroke-opacity', 0)
                 .transition()
-                .duration(this.transition_dur)
+                .duration(transition_dur)
                 .attr('stroke-opacity', 1);
+            plotted_companies.push(el);
         }
-    }
-    
-    
+        else if ($.inArray(el, model.get_company_list()) === -1) {
+            chart_group.select('path#' + el)
+                .transition()
+                .duration(transition_dur)
+                .attr('stroke-opacity', 0)
+                .remove();
+            var i = plotted_companies.indexOf(el);
+            plotted_companies.splice(i, 1);
+        }
+    });
     
 };
 

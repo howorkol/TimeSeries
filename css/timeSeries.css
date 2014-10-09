@@ -33,33 +33,47 @@ form#searchBox h1 {
     margin-bottom: 25px;
 }
 
-input#text, input#button {
-    font-size: 1.3em;
+form#searchBox input {
+     font-size: 1.3em;
 }
 
-input#text {
+form#searchBox input.text {
     padding: 8px 15px;
 }
 
-input#button {
+form#searchBox input.button {
     position: relative;
     padding: 8px 15px;
     left: -4px;
 }
 
-input#text, div#compare_cont > div {
+div.secondary_div input {
+    font-size: 1.1em;
+    padding: 2px;
+}
+
+div.secondary_div input.text {
+    width: calc(80% - 5px);
+}
+
+div.secondary_div input.button {
+    width: calc(20% - 4px);
+    margin-left: -4px;
+}
+
+input.text, div#compare_cont > div {
     background-color: rgba(0, 0, 0, 0.12);
 }
 
-input#button, div#compare_cont > div:hover {
+input.button, div#compare_cont > div:hover {
     background-color: rgba(0, 0, 0, 0.24);
 }
 
-input#button:hover, div#compare_cont > div.selected {
+input.button:hover, div#compare_cont > div.selected {
     background-color: rgba(0, 0, 0, 0.36);
 }
 
-input#button:active {
+input.button:active {
     background-color: rgba(0, 0, 0, 0.48);
 }
 

@@ -75,7 +75,7 @@ function add_company(company_name, callback) {
             // Add a click listener to the new element.
             $('p.company i#' + company_name).click(function() {
                 var comp = $(this).attr('id');
-            
+                
                 delete_company(comp, function() {
                     $('p.company i#' + comp).parent().remove();
                 });

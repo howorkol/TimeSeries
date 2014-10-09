@@ -77,8 +77,6 @@ Model.prototype.add_company = function(company_name, data) {
 }
 
 Model.prototype.delete_company = function(company_name) {
-    var i = this.company_list.indexOf(company_name);
-    
     // Go through the data structure and delete data from this company.
     for (var j in this.attribute_list) {
         delete this.comp_data[this.attribute_list[j]][company_name];
@@ -87,7 +85,10 @@ Model.prototype.delete_company = function(company_name) {
     // Remove the company from company_list.
     this.unused_color_list.unshift(this.used_colors[company_name]);
     delete this.used_colors[company_name];
+    
+    var i = this.company_list.indexOf(company_name);
     this.company_list.splice(i, 1);
+    //console.log(this.company_list);
     
     this.update_chart_lines();
 }

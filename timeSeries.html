@@ -5,24 +5,10 @@
     <title>TimeSeries</title>
     
     <link href="css/timeSeries.css" rel="stylesheet" type="text/css"/>
+    <link href="css/Chart.css" rel="stylesheet" type="text/css"/>
     <link href="css/liteAccordion.css" rel="stylesheet" type="text/css"/>
     <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-    <style>
-        .axis path,
-        .axis line {
-          fill: none;
-          stroke: #000;
-          shape-rendering: crispEdges;
-        }
-        .x.axis path {
-          display: none;
-        }
-        .line {
-          fill: none;
-          stroke-width: 1.5px;
-        }
-    </style>
 </head>
 <body>
     <div id='accordion_cont'>
@@ -33,8 +19,8 @@
         <div class='slide_container' id='start_slide'>
             <form id='searchBox' autocomplete='off'>
                 <h1>Search for a company to begin</h1>
-                <input id='text' type="text" placeholder="Search...">
-                <input id='button' type="button" value="Search">
+                <input class='text' type="text" placeholder="Search...">
+                <input class='button' type="button" value="Search">
             </form>
         </div>
         </div>
@@ -46,8 +32,6 @@
         <div class='slide_container' id='visulaization_slide'>
             <div class='page_top'>
                 <input id='add' type="button" value="Add Attribute">
-                <input id='c_text' type="text" placeholder="Add Company">
-                <input id='add_c' type="button" value="Add Company">
                 <h1>
                     <span class='company_name'>Company Name</span>&nbsp;|
                     <span class='company_perc'>0.00</span>%
@@ -55,6 +39,10 @@
             </div>
             <div class='main_div' id='visualizations'><ul></ul></div>
             <div class='secondary_div' id='legend'>
+                <form autocomplete='off'>
+                    <input class='text' type="text" placeholder="Compare With...">
+                    <input class='button' type="button" value="Go">
+                </form>
                 <i id='trash' class='fa fa-trash fa-5x hidden'></i>
             </div>
         </div>
