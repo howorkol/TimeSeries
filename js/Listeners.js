@@ -74,17 +74,41 @@ $('form#searchBox > input.button').click(function () {
     $('p.company').remove();
     $('div#visualizations ul').sortable('option', 'disabled', true);
     
-    add_company(search_term, function(err) {
+    get_tickers(search_term, function(err, company_info) {
         if (err) {
-            
-        } else {
+            console.log('No results found.');
+            return false;
+        }
+        add_company(company_info, function(err) {
+            if (err) {
+                console.log('No data for ' + company_info.name);
+                return false;
+            }
             disable_slides = false;
-            $('.company_name').text(search_term);
+            $('.company_name').text(company_info.name);
             $('ol li:nth-child(2) span').click();
             $('form#searchBox > input.text').val('');
-        }
+        });
+        
     });
 });
+
+var YAHOO = {'Finance': {'SymbolSuggest': {}}};
+var get_tickers = function(query, callback) {
+    YAHOO.Finance.SymbolSuggest.ssCallback = function(data) {
+        if (data.ResultSet.Result.length > 0) 
+            callback(null, {name:   data.ResultSet.Result[0].name, 
+                            ticker: data.ResultSet.Result[0].symbol});
+        else
+            callback('err', null);
+    }
+
+    $.ajax({
+        url: "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=" + query,
+        dataType: 'jsonp',
+        jsonpCallback: 'YAHOO.Finance.SymbolSuggest.ssCallback'
+    });
+}
 
 $('span.slide_title').click(function() {
     if (disable_slides === true) { return false; }
@@ -102,12 +126,18 @@ $('input#add').click(function() {
 });
 
 $('div.secondary_div input.button').click(function() {
-    var c = $('div.secondary_div input.text').val();
-    add_company(c, function(err) {
+    var search_term = $('div.secondary_div input.text').val();
+    get_tickers(search_term, function(err, company_info) {
         if (err) {
-            
-        } 
-        
-        $('div.secondary_div input.text').val('');
+            console.log('No results found.');
+            return false;
+        }
+        add_company(company_info, function(err) {
+            if (err) {
+                console.log('No data for ' + company_info.name);
+                return false;
+            }
+            $('div.secondary_div input.text').val('');
+        });
     });
 });

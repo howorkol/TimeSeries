@@ -7,14 +7,14 @@ var parseDate = d3.time.format("%Y-%m-%d").parse;
 var total = 0;
 var model = new Model();
 
-function add_company(company_name, callback) {
+function add_company(company_info, callback) {
     
     if (model.get_num_attributes() == 0) {
         // This is the first company being added.
         total = 1;
         
         var query = query_part;
-        query += 'WIKI.' + company_name + '.' + init_attribute + auth_token;
+        query += 'WIKI.' + company_info.ticker + '.' + init_attribute + auth_token;
         
         d3.json(query, function(err, data) {
             if (err) {
@@ -28,12 +28,12 @@ function add_company(company_name, callback) {
             });
             
             model.add_attribute(init_attribute);
-            model.add_company(company_name, data.data);
+            model.add_company(company_info.ticker, data.data);
             model.add_chart(init_attribute);
             
             $('div#visulaization_slide div.secondary_div').append(
-                '<p class="company" style="color:' + model.get_color(company_name)
-                    + '">' + company_name + '</p>'
+                '<p class="company" style="color:' + model.get_color(company_info.ticker)
+                    + '" title="' + company_info.name + '">' + company_info.ticker + '</p>'
             );
             total++;
             
@@ -43,7 +43,7 @@ function add_company(company_name, callback) {
         // This is not the first company being added.
         var query = query_part;
         for (a in model.attribute_list) {
-            query += 'WIKI.' + company_name + '.' + model.attribute_list[a] + ',';
+            query += 'WIKI.' + company_info.ticker + '.' + model.attribute_list[a] + ',';
         }
         query = query.substring(0, query.length - 1);
         query += auth_token;
@@ -64,16 +64,16 @@ function add_company(company_name, callback) {
                 }
             });
             
-            model.add_company(company_name, data.data);
+            model.add_company(company_info.ticker, data.data);
             
             $('div#visulaization_slide div.secondary_div').append(
-                '<p class="company" style="color:' + model.get_color(company_name)
-                    + '">' + company_name 
-                    + '<i id="' + company_name + '" class="fa fa-times"></i></p>'
+                '<p class="company" style="color:' + model.get_color(company_info.ticker)
+                    + '" title="' + company_info.name + '">' + company_info.ticker 
+                    + '<i id="' + company_info.ticker + '" class="fa fa-times"></i></p>'
             );
         
             // Add a click listener to the new element.
-            $('p.company i#' + company_name).click(function() {
+            $('p.company i#' + company_info.ticker).click(function() {
                 var comp = $(this).attr('id');
                 
                 delete_company(comp, function() {
