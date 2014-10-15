@@ -1,3 +1,4 @@
+var timeout;
 
 $('#accordion_cont').liteAccordion({
     containerWidth: $(window).width() - 23,
@@ -62,53 +63,30 @@ $('form').submit(function() {
 });
 
 $('form#searchBox > input.button').click(function () {
-    var search_term = $('form#searchBox > input.text').val();
-    if (search_term === '') { 
-        // Output "must enter search term"
-        return false; 
+    var selected_company = {
+        'ticker': $('form#searchBox .select option:selected').attr('ticker'),
+        'name': $('form#searchBox .select option:selected').attr('name')
     }
     
-    // Reset the model.
     model = new Model();
     $('div#visualizations ul li').remove();
     $('p.company').remove();
     $('div#visualizations ul').sortable('option', 'disabled', true);
     
-    get_tickers(search_term, function(err, company_info) {
+    add_company(selected_company, function(err) {
         if (err) {
-            console.log('No results found.');
+            console.log('No data for ' + selected_company.name);
             return false;
         }
-        add_company(company_info, function(err) {
-            if (err) {
-                console.log('No data for ' + company_info.name);
-                return false;
-            }
-            disable_slides = false;
-            $('.company_name').text(company_info.name);
-            $('ol li:nth-child(2) span').click();
-            $('form#searchBox > input.text').val('');
-        });
+        
+        disable_slides = false;
+        $('.company_name').text(selected_company.name);
+        $('ol li:nth-child(2) span').click();
+        $('form#searchBox > input.text').val('');
+        $('form#searchBox select option').remove();
         
     });
 });
-
-var YAHOO = {'Finance': {'SymbolSuggest': {}}};
-var get_tickers = function(query, callback) {
-    YAHOO.Finance.SymbolSuggest.ssCallback = function(data) {
-        if (data.ResultSet.Result.length > 0) 
-            callback(null, {name:   data.ResultSet.Result[0].name, 
-                            ticker: data.ResultSet.Result[0].symbol});
-        else
-            callback('err', null);
-    }
-
-    $.ajax({
-        url: "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=" + query,
-        dataType: 'jsonp',
-        jsonpCallback: 'YAHOO.Finance.SymbolSuggest.ssCallback'
-    });
-}
 
 $('span.slide_title').click(function() {
     if (disable_slides === true) { return false; }
@@ -127,17 +105,67 @@ $('input#add').click(function() {
 
 $('div.secondary_div input.button').click(function() {
     var search_term = $('div.secondary_div input.text').val();
+    
     get_tickers(search_term, function(err, company_info) {
         if (err) {
             console.log('No results found.');
             return false;
         }
-        add_company(company_info, function(err) {
+        add_company(company_info[0], function(err) {
             if (err) {
-                console.log('No data for ' + company_info.name);
+                console.log('No data for ' + company_info[0].name);
                 return false;
             }
             $('div.secondary_div input.text').val('');
         });
     });
+});
+
+var YAHOO = {'Finance': {'SymbolSuggest': {}}};
+var get_tickers = function(query, callback) {
+    YAHOO.Finance.SymbolSuggest.ssCallback = function(data) {
+        if (data.ResultSet.Result.length > 0) 
+            callback(null, data.ResultSet.Result.map(function(item) {
+                return {'ticker': item.symbol, 'name': item.name};
+            }));
+        else
+            callback('err', null);
+    }
+
+    $.ajax({
+        url: "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=" + query,
+        dataType: 'jsonp',
+        jsonpCallback: 'YAHOO.Finance.SymbolSuggest.ssCallback'
+    });
+}
+
+$('form#searchBox .text').on('input propertychange paste', function() {
+    var search_term = $(this).val();
+    if (search_term === '') { 
+        // Output "must enter search term"
+        $('form#searchBox input.button').attr('disabled','disabled');
+        $('form#searchBox select option').remove();
+        return false; 
+    }
+    
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+        get_tickers(search_term, function(err, companies) {
+            $('form#searchBox input.button').removeAttr('disabled');
+            $('form#searchBox select option').remove();
+            var elem = $('form#searchBox .select');
+            for(company in companies) {
+                elem.append($("<option></option>")
+                    .attr('ticker', companies[company].ticker)
+                    .attr('name', companies[company].name)
+                    .text(companies[company].ticker + ' - ' + companies[company].name));
+            }
+            $('form#searchBox .text').val(companies[0].ticker + ' - ' + companies[0].name);
+        })
+    }, 1000);
+});
+
+$('form#searchBox .select').change(function() {
+    var val = $('form#searchBox .select option:selected').text();
+    $('form#searchBox .text').val(val);
 });

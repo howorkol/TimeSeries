@@ -1,10 +1,10 @@
 var Model = function() {
     this.company_list = [];
     this.attribute_list = [];
-    this.comp_data = {};
+    this.attribute_data = {};
     this.charts = {};
     this.unused_color_list = [
-        '#72abd4', '#FAA43A', '#60BD68', '#F17CB0', '#B276B2', '#DECF3F', '#F15854'
+        '#72abd4', '#60BD68', '#FAA43A', '#F17CB0', '#B276B2', '#DECF3F', '#F15854'
     ];
     this.used_colors = {};
 }
@@ -26,7 +26,7 @@ Model.prototype.get_company_name = function(index) {
 }
 
 Model.prototype.get_data = function(attribute_name, company_name) {
-    return this.comp_data[attribute_name][company_name];
+    return this.attribute_data[attribute_name][company_name];
 }
 
 Model.prototype.add_chart = function(attribute_name, chart) {
@@ -35,12 +35,12 @@ Model.prototype.add_chart = function(attribute_name, chart) {
 
 Model.prototype.add_attribute = function(attribute_name, data) {
     this.attribute_list.push(attribute_name);
-    this.comp_data[attribute_name] = {};
+    this.attribute_data[attribute_name] = {};
     
     if (data) {
-        this.comp_data[attribute_name] = {};
+        this.attribute_data[attribute_name] = {};
         for (var i in this.company_list) {
-            this.comp_data[attribute_name][this.company_list[i]] = 
+            this.attribute_data[attribute_name][this.company_list[i]] = 
                     data.map(function(d) {
                 return [d[0], d[parseInt(i) + 1]];
             });
@@ -55,7 +55,7 @@ Model.prototype.delete_attribute = function(attribute_name) {
     this.attribute_list.splice(i, 1);
     
     // Delete the data for that attribute, as well as the chart.
-    delete this.comp_data[attribute_name];
+    delete this.attribute_data[attribute_name];
     delete this.charts[attribute_name];
     
     // Go through the remaining charts and update their heights.
@@ -67,9 +67,9 @@ Model.prototype.add_company = function(company_name, data) {
     this.company_list.push(company_name);
     this.used_colors[company_name] = this.unused_color_list.shift();
     
-    // Add the data to comp_data.
+    // Add the data to attribute_data.
     for (var i in this.attribute_list) {
-        this.comp_data[this.attribute_list[i]][company_name] = 
+        this.attribute_data[this.attribute_list[i]][company_name] = 
             data.map(function(d) { return [d[0], d[parseInt(i) + 1]]; });
     }
     
@@ -79,7 +79,7 @@ Model.prototype.add_company = function(company_name, data) {
 Model.prototype.delete_company = function(company_name) {
     // Go through the data structure and delete data from this company.
     for (var j in this.attribute_list) {
-        delete this.comp_data[this.attribute_list[j]][company_name];
+        delete this.attribute_data[this.attribute_list[j]][company_name];
     }
     
     // Remove the company from company_list.
@@ -115,12 +115,12 @@ Model.prototype.date_range = function() {
     // of the dates from all datasets.
     var min, max;
     
-    for (var attribute in this.comp_data) {
-        for (var company in this.comp_data[attribute]) {
-            var local_min = d3.min(this.comp_data[attribute][company], function(d) {
+    for (var attribute in this.attribute_data) {
+        for (var company in this.attribute_data[attribute]) {
+            var local_min = d3.min(this.attribute_data[attribute][company], function(d) {
                 if (d[1] !== null) return d[0];
             });
-            var local_max = d3.max(this.comp_data[attribute][company], function(d) {
+            var local_max = d3.max(this.attribute_data[attribute][company], function(d) {
                 if (d[1] !== null) return d[0];
             });
             if ((min == undefined) || (local_min < min)) min = local_min;
@@ -135,11 +135,11 @@ Model.prototype.value_range = function(attribute) {
     // the [min, max] of the values of this dataset.
     var min, max;
     
-    for (company in this.comp_data[attribute]) {
-        var local_min = d3.min(this.comp_data[attribute][company], function(d) {
+    for (company in this.attribute_data[attribute]) {
+        var local_min = d3.min(this.attribute_data[attribute][company], function(d) {
             return d[1];
         });
-        var local_max = d3.max(this.comp_data[attribute][company], function(d) {
+        var local_max = d3.max(this.attribute_data[attribute][company], function(d) {
             return d[1];
         });
         if ((min == undefined) || (local_min < min)) min = local_min;

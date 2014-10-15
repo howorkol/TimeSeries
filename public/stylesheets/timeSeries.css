@@ -16,7 +16,7 @@ h2.selected + div > div.slide_container {
 }
 
 form#searchBox {
-    width:400px;
+    width: 400px;
     position: fixed;
     top: 35%;
     left: 15%;
@@ -33,19 +33,32 @@ form#searchBox h1 {
     margin-bottom: 25px;
 }
 
+form#searchBox input, form#searchBox .select {
+    font-size: 1.3em;
+    padding: 8px 15px;
+    height: 25px;
+}
+
 form#searchBox input {
-     font-size: 1.3em;
+    position: absolute;
+    bottom: 0;
 }
 
 form#searchBox input.text {
-    padding: 8px 15px;
+    width: 260px;
 }
 
 form#searchBox input.button {
-    position: relative;
-    padding: 8px 15px;
-    left: -4px;
+    right: 0;
+    width: 60px;
 }
+
+form#searchBox .select {
+    width: 280px;
+}
+
+
+/**/
 
 div.secondary_div input {
     font-size: 1.1em;
@@ -62,19 +75,19 @@ div.secondary_div input.button {
 }
 
 input.text, div#compare_cont > div {
-    background-color: rgba(0, 0, 0, 0.12);
+    background-color: #ddd;
 }
 
 input.button, div#compare_cont > div:hover {
-    background-color: rgba(0, 0, 0, 0.24);
+    background-color: #aaa;
 }
 
 input.button:hover, div#compare_cont > div.selected {
-    background-color: rgba(0, 0, 0, 0.36);
+    background-color: #777;
 }
 
 input.button:active {
-    background-color: rgba(0, 0, 0, 0.48);
+    background-color: #444;
 }
 
 div.slide_container > div {
@@ -179,6 +192,7 @@ p.company i.fa-times {
 p.company i.fa-times:hover {
     color: rgba(0, 0, 0, 0.24);
 }
+
 
 /*h2 span, div.slide {
     -moz-transition: background-color 0.3s;
