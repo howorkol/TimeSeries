@@ -110,6 +110,13 @@ Model.prototype.update_chart_height = function() {
     }
 }
 
+Model.prototype.update_chart_domain = function(extent) {
+    Chart.prototype.x.domain(extent);
+    for (chart in this.charts) {
+        this.charts[chart].update_chart_domain();
+    }
+}
+
 Model.prototype.date_range = function() {
     // Since the x domain of all charts should be equal, return [min, max]
     // of the dates from all datasets.

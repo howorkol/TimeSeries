@@ -5,39 +5,40 @@ var Chart = function(attribute) {
     this.make_chart();
 };
 
-Chart.prototype.chart_container = 'div#visualizations ul';
+var chart_container = 'div#visualizations div#charts ul';
+var margin = {top: 5, right: 0, bottom: 5, left: 65, s_bottom: 20};
+
 Chart.prototype.min_chart_height = 150;
-Chart.prototype.margin = {top: 5, right: 12, bottom: 5, left: 65};
-Chart.prototype.width = $(Chart.prototype.chart_container).width() 
-        - Chart.prototype.margin.left - Chart.prototype.margin.right;
 Chart.prototype.x = d3.time.scale();
 Chart.prototype.y = d3.scale.linear();
 Chart.prototype.line = d3.svg.line()
         .defined(function(d) { return d[1] != null; })
         .x(function(d) { return Chart.prototype.x(d[0]); })
         .y(function(d) { return Chart.prototype.y(d[1]); });
+Chart.prototype.width;
 Chart.prototype.height;
 Chart.prototype.transition_dur = 500;
 
 Chart.prototype.make_chart = function() {
+    this.width = $(chart_container).width();
     
-    var chart_height = this.height - this.margin.top - this.margin.bottom;
-    var chart_width = this.width - this.margin.left - this.margin.right;
+    var chart_height = this.height - margin.top - margin.bottom;
+    var chart_width = this.width - margin.left - margin.right;
     
-    this.svg = d3.select(this.chart_container)
+    this.svg = d3.select(chart_container)
         .append('li')
         .attr('id', this.attribute)
         .append('svg')
-        .attr('width',  $(this.chart_container).width())
+        .attr('width',  $(chart_container).width())
         .attr('height', this.height);
     
     this.chart_group = this.svg.append('g')
         .attr('class', 'chart')
         .attr('id', this.attribute)
-        .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
-
-    var x = this.x.domain(model.date_range()).range([0, chart_width]);
-    var y = this.y.domain(model.value_range(this.attribute)).range([chart_height, 0]);
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    
+    var x = this.x.domain(model.date_range()).range([1, chart_width]);
+    var y = this.y.domain(model.value_range(this.attribute)).range([chart_height, 1]);
     
     this.xAxis = d3.svg.axis().scale(this.x).orient('bottom');
     this.yAxis = d3.svg.axis().scale(this.y).orient('left');
@@ -64,7 +65,7 @@ Chart.prototype.make_chart = function() {
 }
 
 Chart.prototype.update_chart_height = function() {
-    var y = this.y.range([this.height - this.margin.top - this.margin.bottom, 0]);
+    var y = this.y.range([this.height - margin.top - margin.bottom, 0]);
     var x = this.x;
 
     this.svg
@@ -129,11 +130,14 @@ Chart.prototype.update_chart_lines = function() {
     
 };
 
+Chart.prototype.update_chart_domain = function() {
+    this.chart_group.selectAll(".line").attr("d", Chart.prototype.line);
+}
+
 Chart.prototype.set_height = function() {
-    var total_height = $('div#visualizations').height();
-    
+    var total_height = $('div#visualizations div#charts').height();
     // Calculate the new chart height.
     Chart.prototype.height = ((total_height / model.get_num_attributes()) > this.min_chart_height)
-            ? total_height / model.get_num_attributes()
+            ? (total_height / model.get_num_attributes()) - 7
             : this.min_chart_height;
 };

@@ -107,10 +107,19 @@ div.slide_container div.main_div, div.slide_container div.secondary_div {
     margin-top: 0;
 }
 
+div#visualizations div#charts {
+    overflow-y: scroll;
+    height: calc(100% - 70px);
+}
+
+div#visualizations div#slider {
+    height: 70px;
+}
+
 div.slide_container div.main_div {
     width: calc(100% - 196px);
     float: left;
-    overflow-y: scroll;
+    /*overflow-y: scroll;*/
 }
 
 div.slide_container div.secondary_div {
@@ -166,6 +175,10 @@ svg rect {
 
 li.ui-sortable-helper svg rect {
     fill-opacity: 0.5;
+}
+
+div#charts ul li:hover {
+    cursor: move;
 }
 
 i#trash {

@@ -30,6 +30,7 @@ function add_company(company_info, callback) {
             model.add_attribute(init_attribute);
             model.add_company(company_info.ticker, data.data);
             model.add_chart(init_attribute);
+            create_slider();
             
             $('div#visulaization_slide div.secondary_div').append(
                 '<p class="company" style="color:' + model.get_color(company_info.ticker)
