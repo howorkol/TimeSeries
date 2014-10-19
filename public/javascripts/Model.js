@@ -7,6 +7,7 @@ var Model = function() {
         '#72abd4', '#60BD68', '#FAA43A', '#F17CB0', '#B276B2', '#DECF3F', '#F15854'
     ];
     this.used_colors = {};
+    $('div#slider svg').remove();
 }
 
 Model.prototype.get_num_attributes = function() {
@@ -73,6 +74,8 @@ Model.prototype.add_company = function(company_name, data) {
             data.map(function(d) { return [d[0], d[parseInt(i) + 1]]; });
     }
     
+    //slider_add_company()
+    //update_slider_domain();
     this.update_chart_lines();
 }
 
@@ -88,7 +91,6 @@ Model.prototype.delete_company = function(company_name) {
     
     var i = this.company_list.indexOf(company_name);
     this.company_list.splice(i, 1);
-    //console.log(this.company_list);
     
     this.update_chart_lines();
 }

@@ -27,10 +27,11 @@ function add_company(company_info, callback) {
                 d[1] = +d[1];
             });
             
+            
             model.add_attribute(init_attribute);
             model.add_company(company_info.ticker, data.data);
-            model.add_chart(init_attribute);
             create_slider();
+            model.add_chart(init_attribute);
             
             $('div#visulaization_slide div.secondary_div').append(
                 '<p class="company" style="color:' + model.get_color(company_info.ticker)
@@ -66,6 +67,7 @@ function add_company(company_info, callback) {
             });
             
             model.add_company(company_info.ticker, data.data);
+            update_slider_domain();
             
             $('div#visulaization_slide div.secondary_div').append(
                 '<p class="company" style="color:' + model.get_color(company_info.ticker)
@@ -89,6 +91,7 @@ function add_company(company_info, callback) {
 
 function delete_company(company_name, callback) {
     model.delete_company(company_name);
+    update_slider_domain();
     callback();
 }
 

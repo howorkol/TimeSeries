@@ -3,14 +3,18 @@ var slider = {};
 var s_x = d3.time.scale(),
     s_y = d3.scale.linear();
 
+var s_xAxis;
+
 var s_line = d3.svg.line()
         .defined(function(d) { return d[1] != null; })
         .x(function(d) { return s_x(d[0]); })
         .y(function(d) { return s_y(d[1]); });
 
+var brush;
+
 function create_slider() {
     
-    var brush = d3.svg.brush('div#slider')
+    brush = d3.svg.brush('div#slider')
         .x(s_x)
         .on("brush", brushed);
     
@@ -23,7 +27,7 @@ function create_slider() {
     s_y.domain(model.value_range(init_attribute))
         .range([s_height, 1]);
     
-    var s_xAxis = d3.svg.axis().scale(s_x).orient("bottom")
+    s_xAxis = d3.svg.axis().scale(s_x).orient("bottom")
     
     slider.svg = d3.select('div#slider')
         .append('svg')
@@ -53,4 +57,26 @@ function create_slider() {
     function brushed() {
         model.update_chart_domain(brush.empty() ? model.date_range() : brush.extent());
     }
+}
+
+function update_slider_domain() {
+    var extent = brush.extent();
+    
+    s_x.domain(model.date_range());
+    slider.svg.selectAll('.line')
+        .transition().duration(500)
+        .attr('d', s_line);
+    
+    slider.svg.select('.axis')
+        .transition()
+        .duration(500)
+        .call(s_xAxis);
+
+    brush.extent(extent);
+    brush(d3.select(".brush").transition().duration(500));
+    brush.event(d3.select(".brush").transition().duration(500));
+}
+
+function slider_add_company() {
+    
 }
