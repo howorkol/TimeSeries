@@ -74,8 +74,10 @@ Model.prototype.add_company = function(company_name, data) {
             data.map(function(d) { return [d[0], d[parseInt(i) + 1]]; });
     }
     
-    //slider_add_company()
-    //update_slider_domain();
+    //slider_add_company(company_name)
+    //if (this.company_list.length > 1)
+    //    update_slider_domain();
+    
     this.update_chart_lines();
 }
 
@@ -92,6 +94,7 @@ Model.prototype.delete_company = function(company_name) {
     var i = this.company_list.indexOf(company_name);
     this.company_list.splice(i, 1);
     
+    slider_remove_company(company_name);
     this.update_chart_lines();
 }
 

@@ -35,13 +35,13 @@ function create_slider() {
         .attr('height',  $('div#slider').height())
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-    
+    /*
     slider.svg.append('path')
         .datum(model.get_data(init_attribute, model.get_company_name(0)))
         .attr('class', 'line')
         .attr('d', s_line)
         .attr('stroke', model.get_color(model.get_company_name(0)));
-    
+    */
     slider.svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + s_height + ")")
@@ -55,16 +55,30 @@ function create_slider() {
         .attr("height", s_height + 7);
 
     function brushed() {
+        console.log('brush');
         model.update_chart_domain(brush.empty() ? model.date_range() : brush.extent());
     }
 }
 
+function update_slider() {
+    //update_slider_domain();
+    //var lines = $('div#charts ul svg .chart:first .line_group')
+    //    .clone()
+    //    .appendTo('div#slider svg g');
+    
+    //console.log(line_group);
+}
+
 function update_slider_domain() {
     var extent = brush.extent();
+    var s_height = $('div#slider').height() - margin.top - margin.s_bottom;
     
     s_x.domain(model.date_range());
+    s_y.domain(model.value_range(init_attribute));
+    
     slider.svg.selectAll('.line')
-        .transition().duration(500)
+        .transition()
+        .duration(500)
         .attr('d', s_line);
     
     slider.svg.select('.axis')
@@ -74,9 +88,22 @@ function update_slider_domain() {
 
     brush.extent(extent);
     brush(d3.select(".brush").transition().duration(500));
-    brush.event(d3.select(".brush").transition().duration(500));
+    //brush.event(d3.select(".brush").transition().duration(500));
 }
 
-function slider_add_company() {
-    
+function slider_add_company(company_name) {
+    slider.svg.append('path')
+        .datum(model.get_data(init_attribute, company_name))
+        .attr('class', 'line')
+        .attr('id', company_name)
+        .attr('d', s_line)
+        .attr('stroke', model.get_color(company_name))
+        .attr('stroke-opacity', 0)
+        .transition()
+        .duration(500)
+        .attr('stroke-opacity', 1);
+}
+
+function slider_remove_company(company_name) {
+    d3.select('div#slider path#' + company_name).remove();
 }

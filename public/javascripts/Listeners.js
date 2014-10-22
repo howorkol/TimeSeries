@@ -54,6 +54,8 @@ $('div#visualizations ul').sortable({
         $('i#trash').addClass('hidden');
         $('i#trash').removeClass('fa-trash-o');
         $('i#trash').addClass('fa-trash');
+        
+        update_slider();
     }
 });
 

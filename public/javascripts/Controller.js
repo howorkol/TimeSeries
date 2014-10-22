@@ -32,6 +32,7 @@ function add_company(company_info, callback) {
             model.add_company(company_info.ticker, data.data);
             create_slider();
             model.add_chart(init_attribute);
+            slider_add_company(company_info.ticker);
             
             $('div#visulaization_slide div.secondary_div').append(
                 '<p class="company" style="color:' + model.get_color(company_info.ticker)
@@ -67,7 +68,8 @@ function add_company(company_info, callback) {
             });
             
             model.add_company(company_info.ticker, data.data);
-            update_slider_domain();
+            slider_add_company(company_info.ticker);
+            //update_slider_domain();
             
             $('div#visulaization_slide div.secondary_div').append(
                 '<p class="company" style="color:' + model.get_color(company_info.ticker)

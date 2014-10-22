@@ -82,6 +82,8 @@ Chart.prototype.make_chart = function() {
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
         .text(this.attribute);
+    
+    update_slider_domain();
 }
 
 Chart.prototype.update_chart_height = function() {
@@ -148,21 +150,19 @@ Chart.prototype.update_chart_lines = function() {
             plotted_companies.push(el);
         }
         else if ($.inArray(el, model.get_company_list()) === -1) {
-            line_group.select('path#' + el)
-                .transition()
-                .duration(transition_dur)
-                .attr('stroke-opacity', 0)
-                .remove();
+            line_group.select('path#' + el).remove();
             var i = plotted_companies.indexOf(el);
             plotted_companies.splice(i, 1);
         }
     });
     
+    update_slider_domain();
 };
 
 Chart.prototype.update_chart_domain = function() {
     var line = this.line;
-    this.chart_group.selectAll(".line").attr("d", line);
+    this.chart_group.selectAll(".line")
+        .attr("d", line);
 }
 
 Chart.prototype.set_height = function() {
