@@ -55,7 +55,7 @@ $('div#visualizations ul').sortable({
         $('i#trash').removeClass('fa-trash-o');
         $('i#trash').addClass('fa-trash');
         
-        update_slider();
+        update_slider($('ul li:first-child').attr('id'));
     }
 });
 
@@ -102,7 +102,10 @@ $('div#compare_cont > div').click(function () {
 
 
 $('input#add').click(function() {
-    add_attribute(total.toString(), function(err) {});
+    add_attribute(total.toString(), function(err) {
+        var full_height = $('div#charts ul').height() - $('div#charts').height();
+        $('div#charts').animate({scrollTop: full_height}, 'slow');
+    });
 });
 
 $('div.secondary_div input.button').click(function() {

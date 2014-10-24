@@ -6,7 +6,7 @@ var Chart = function(attribute) {
 };
 
 var chart_container = 'div#visualizations div#charts ul';
-var margin = {top: 5, right: 0, bottom: 5, left: 65, s_bottom: 20};
+var margin = {top: 7, right: 0, bottom: 20, left: 65, s_bottom: 20};
 
 Chart.prototype.min_chart_height = 150;
 Chart.prototype.x = d3.time.scale();
@@ -49,15 +49,34 @@ Chart.prototype.make_chart = function() {
         .range([1, chart_width]);
     var y = this.y = d3.scale.linear()
         .domain(model.value_range(this.attribute))
-        .range([chart_height, 0]);
+        .range([chart_height, 0]).nice();
     
     var line = this.line = d3.svg.line()
         .defined(function(d) { return d[1] != null; })
         .x(function(d) { return Chart.prototype.x(d[0]); })
         .y(function(d) { return y(d[1]); });
     
-    this.xAxis = d3.svg.axis().scale(this.x).orient('bottom');
-    this.yAxis = d3.svg.axis().scale(this.y).orient('left');
+    this.xAxis = d3.svg.axis().scale(this.x).orient('bottom')
+        .tickSize(-chart_height, 0, 0);
+    this.yAxis = d3.svg.axis().scale(this.y).orient('left')
+        .tickSize(-chart_width, 0, 0).ticks(5);
+    
+    
+    
+    this.chart_group.append('g')
+        .attr('class', 'x axis')
+        .call(this.xAxis)
+        .attr('transform', 'translate(0,' + chart_height + ')');
+    
+    this.chart_group.append('g')
+        .attr('class', 'y axis')
+        .call(this.yAxis)
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 6)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'end')
+        .text(this.attribute);
 
     this.line_group = this.chart_group.append('g')
         .attr('class', 'line_group')
@@ -73,16 +92,6 @@ Chart.prototype.make_chart = function() {
         this.plotted_companies.push(model.get_company_name(index));
     }
     
-    this.chart_group.append('g')
-        .attr('class', 'y axis')
-        .call(this.yAxis)
-        .append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 6)
-        .attr('dy', '.71em')
-        .style('text-anchor', 'end')
-        .text(this.attribute);
-    
     update_slider_domain();
 }
 
@@ -91,19 +100,28 @@ Chart.prototype.update_chart_height = function() {
     var x = this.x;
     var line = this.line;
     
+    this.xAxis.tickSize(-(this.height - margin.top - margin.bottom), 0, 0);
+    this.chart_group.select(".x.axis")
+        .transition().duration(this.transition_dur)
+        .call(this.xAxis);
+    
     this.svg
         .transition().duration(this.transition_dur)
         .attr('height', this.height);
     this.svg.select('defs rect')
         .transition().duration(this.transition_dur)
         .attr('height', this.height);
-    //this.line_group.attr('clip-path', 'url(#clip)');
+    this.chart_group.select('.x.axis')
+        .transition().duration(this.transition_dur)
+        .attr('transform', 'translate(0,' + (this.height - margin.top - margin.bottom) + ')');
     this.chart_group.select('.y')
         .transition().duration(this.transition_dur)
         .call(this.yAxis);
     this.chart_group.selectAll('.line')
         .transition().duration(this.transition_dur)
         .attr('d', line);
+    
+    
 };
 
 Chart.prototype.update_chart_lines = function() {
@@ -112,7 +130,7 @@ Chart.prototype.update_chart_lines = function() {
             ? model.date_range() 
             : brush.extent()
     );
-    var y = this.y.domain(model.value_range(this.attribute));
+    var y = this.y.domain(model.value_range(this.attribute)).nice();
     var line = this.line;
     
     this.chart_group.select('.y')
@@ -163,6 +181,7 @@ Chart.prototype.update_chart_domain = function() {
     var line = this.line;
     this.chart_group.selectAll(".line")
         .attr("d", line);
+    this.chart_group.select(".x.axis").call(this.xAxis);
 }
 
 Chart.prototype.set_height = function() {

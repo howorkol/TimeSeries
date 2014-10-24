@@ -1,11 +1,25 @@
 .axis path, .axis line {
     fill: none;
-    stroke: #000;
+    stroke-width: 1.0px;
     shape-rendering: crispEdges;
 }
+
+.axis path {
+    stroke: #000;
+}
+
+.axis line {
+    stroke: #ebebeb;
+}
+
+div#charts .axis.x {
+    font-size: 12px;
+}
+
 .x.axis path {
     display: none;
 }
+
 .line {
     fill: none;
     stroke-width: 1.5px;
