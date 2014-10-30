@@ -206,6 +206,21 @@ p.company i.fa-times:hover {
     color: rgba(0, 0, 0, 0.24);
 }
 
+#info_slide table.comp_table {
+    width: calc(100% - 244px);
+    height: calc(100% - 91px);
+    display: none;
+}
+
+div#comp_attributes_wrapper {
+    height: calc(100% - 91px);
+    
+}
+
+#info_slide table.comp_table.selected {
+    display: block;
+}
+
 
 /*h2 span, div.slide {
     -moz-transition: background-color 0.3s;

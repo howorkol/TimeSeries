@@ -97,6 +97,7 @@ $('span.slide_title').click(function() {
 $('div#compare_cont > div').click(function () {
     if (!$(this).hasClass('selected')) {
         $('div#compare_cont > div').toggleClass('selected');
+        $('div.main_div > table.comp_table').toggleClass('selected');
     }
 });
 
