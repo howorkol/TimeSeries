@@ -178,7 +178,7 @@ li.ui-sortable-helper svg rect {
 }
 
 div#charts ul li:hover {
-    cursor: move;
+    /*cursor: move;*/
 }
 
 i#trash {

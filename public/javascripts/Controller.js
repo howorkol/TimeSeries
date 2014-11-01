@@ -6,8 +6,13 @@ var auth_token = '&auth_token=WczNwgPepRcbZR9Yf7qt';
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 var total = 0;
 var model = new Model();
+var selected_company = null;
+var deselected_color = 'rgba(193, 193, 193, 0.61)';
 
 function add_company(company_info, callback) {
+    
+    var p = d3.select('div#visulaization_slide div.secondary_div').append('p')
+        .attr('class', 'company');
     
     if (model.get_num_attributes() == 0) {
         // This is the first company being added.
@@ -19,6 +24,7 @@ function add_company(company_info, callback) {
         d3.json(query, function(err, data) {
             if (err) {
                 callback(err);
+                p.remove();
                 return;
             }
             
@@ -34,10 +40,13 @@ function add_company(company_info, callback) {
             model.add_chart(init_attribute);
             slider_add_company(company_info.ticker);
             
-            $('div#visulaization_slide div.secondary_div').append(
-                '<p class="company" style="color:' + model.get_color(company_info.ticker)
-                    + '" title="' + company_info.name + '">' + company_info.ticker + '</p>'
-            );
+            p.attr('title', company_info.name)
+                .style('color', model.get_color(company_info.ticker))
+                .text(company_info.ticker)
+                .on('click', function() {
+                    click_company_name(company_info.ticker);
+                });
+                
             total++;
             
             callback(null);
@@ -54,6 +63,7 @@ function add_company(company_info, callback) {
         d3.json(query, function(err, data) {
             if (err) {
                 callback(err);
+                p.remove();
                 return;
             }
             
@@ -69,25 +79,69 @@ function add_company(company_info, callback) {
             
             model.add_company(company_info.ticker, data.data);
             slider_add_company(company_info.ticker);
-            //update_slider_domain();
             
-            $('div#visulaization_slide div.secondary_div').append(
-                '<p class="company" style="color:' + model.get_color(company_info.ticker)
-                    + '" title="' + company_info.name + '">' + company_info.ticker 
-                    + '<i id="' + company_info.ticker + '" class="fa fa-times"></i></p>'
-            );
-        
-            // Add a click listener to the new element.
-            $('p.company i#' + company_info.ticker).click(function() {
-                var comp = $(this).attr('id');
-                
-                delete_company(comp, function() {
-                    $('p.company i#' + comp).parent().remove();
+            p.attr('title', company_info.name)
+                .style('color', function() {
+                    if (selected_company == null)
+                        return model.get_color(company_info.ticker);
+                    else return deselected_color;
+                })
+                .text(company_info.ticker)
+                .on('click', function() {
+                    click_company_name(company_info.ticker);
+                })
+              .append('i')
+                .attr('id', company_info.ticker)
+                .attr('class', 'fa fa-times')
+                .on('click', function() {
+                    var comp = $(this).attr('id');
+                    delete_company(comp, function() {
+                        $('p.company i#' + comp).parent().remove();
+                        //click_company_name(company_info.ticker);
+                    });
                 });
-            });
             
             callback(null);
         });
+    }
+    
+    function click_company_name(c) {
+        if (model.get_company_list().length == 1) return;
+        var ps = d3.selectAll('p.company');
+        
+        if (selected_company == null) {
+            ps.each(function() {
+                var name = d3.select(this).text();
+                if (name != c) {
+                    d3.select(this).style('color', deselected_color);
+                    d3.selectAll('path#' + name)
+                        .attr('stroke', deselected_color);
+                }
+            });
+            selected_company = c;
+        } else if (selected_company == c) {
+            ps.each(function() {
+                var name = d3.select(this).text();
+                d3.select(this).style('color', model.get_color(name));
+                d3.selectAll('path#' + name)
+                    .attr('stroke', model.get_color(name))
+                    .moveToFront();
+            });
+            selected_company = null;
+        } else {
+            ps.each(function() {
+                var name = d3.select(this).text();
+                if (name == c) {
+                    d3.select(this).style('color', model.get_color(name));
+                    d3.selectAll('path#' + name).attr('stroke', model.get_color(name))
+                        .moveToFront();
+                } else {
+                    d3.select(this).style('color', deselected_color);
+                    d3.selectAll('path#' + name).attr('stroke', deselected_color);
+                }
+            });
+            selected_company = c;
+        }
     }
 }
 
@@ -137,3 +191,11 @@ function delete_attribute(li_element, attribute_name, callback) {
     model.delete_attribute(attribute_name);
     callback();
 }
+
+d3.selection.prototype.moveToFront = function() {
+    // Info found here 
+    // http://stackoverflow.com/questions/14167863/how-can-i-bring-a-circle-to-the-front-with-d3
+    return this.each(function(){
+        this.parentNode.appendChild(this);
+    });
+};

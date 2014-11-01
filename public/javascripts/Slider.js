@@ -92,7 +92,11 @@ function update_slider(new_attr) {
             .attr('class', 'line')
             .attr('id', company_name)
             .attr('d', s_line)
-            .attr('stroke', model.get_color(company_name))
+            .attr('stroke', function() {
+                if (selected_company == null || selected_company == company_name)
+                    return model.get_color(company_name);
+                else return deselected_color;
+            })
             .attr('stroke-opacity', 0)
             .transition()
             .duration(500)
@@ -142,7 +146,11 @@ function slider_add_company(company_name) {
         .attr('class', 'line')
         .attr('id', company_name)
         .attr('d', s_line)
-        .attr('stroke', model.get_color(company_name))
+        .attr('stroke', function() {
+            if (selected_company == null || selected_company == company_name)
+                return model.get_color(company_name);
+            else return deselected_color;
+        })
         .attr('stroke-opacity', 0)
         .transition()
         .duration(500)

@@ -65,7 +65,7 @@ $('form').submit(function() {
 });
 
 $('form#searchBox > input.button').click(function () {
-    var selected_company = {
+    var company = {
         'ticker': $('form#searchBox .select option:selected').attr('ticker'),
         'name': $('form#searchBox .select option:selected').attr('name')
     }
@@ -74,15 +74,16 @@ $('form#searchBox > input.button').click(function () {
     $('div#visualizations ul li').remove();
     $('p.company').remove();
     $('div#visualizations ul').sortable('option', 'disabled', true);
+    selected_company = null;
     
-    add_company(selected_company, function(err) {
+    add_company(company, function(err) {
         if (err) {
-            console.log('No data for ' + selected_company.name);
+            console.log('No data for ' + company.name);
             return false;
         }
         
         disable_slides = false;
-        $('.company_name').text(selected_company.name);
+        $('.company_name').text(company.name);
         $('ol li:nth-child(2) span').click();
         $('form#searchBox > input.text').val('');
         $('form#searchBox select option').remove();
@@ -174,4 +175,8 @@ $('form#searchBox .text').on('input propertychange paste', function() {
 $('form#searchBox .select').change(function() {
     var val = $('form#searchBox .select option:selected').text();
     $('form#searchBox .text').val(val);
+});
+
+$('p.company').click(function() {
+    console.log('hi');
 });

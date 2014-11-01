@@ -31,7 +31,13 @@ Chart.prototype.make_chart = function() {
         .attr('id', this.attribute)
         .append('svg')
         .attr('width',  $(chart_container).width())
-        .attr('height', this.height);
+        .attr('height', this.height)
+        .on('mousemove', function() {
+            var x0 = x.invert(d3.mouse(this)[0] - margin.left);
+            //var bisectDate = d3.bisector(function(d) { return d[0]; }).left;
+            //var i = bisectDate(data, x0, 1);    
+            console.log(x0);
+        });
     
     // The clip path area is where is chart is allowed to show through.
     // When the user selects an area with the slider, the line widths are
@@ -104,7 +110,13 @@ Chart.prototype.make_chart = function() {
             .attr("class", "line")
             .attr('id', model.get_company_name(index))
             .attr("d", line)
-            .attr('stroke', model.get_color(model.get_company_name(index)));
+            .attr('stroke', function() {
+                if (selected_company == null || selected_company == model.get_company_name(index))
+                    return model.get_color(model.get_company_name(index));
+                else 
+                    return deselected_color;
+            });
+            //.attr('stroke', model.get_color(model.get_company_name(index)));
         this.plotted_companies.push(model.get_company_name(index));
     }
     
@@ -210,7 +222,12 @@ Chart.prototype.update_chart_lines = function() {
                 .attr("class", "line")
                 .attr('id', el)
                 .attr("d", line)
-                .attr('stroke', model.get_color(el))
+                .attr('stroke', function() {
+                    if (selected_company == null || selected_company == el)
+                        return model.get_color(el);
+                    else 
+                        return deselected_color;
+                })
                 .attr('stroke-opacity', 0)
                 .transition()
                 .duration(transition_dur)
