@@ -79,6 +79,7 @@ Model.prototype.add_company = function(company_name, data) {
     //    update_slider_domain();
     
     this.update_chart_lines();
+    //this.update_chart_domain();
 }
 
 Model.prototype.delete_company = function(company_name) {
@@ -96,6 +97,7 @@ Model.prototype.delete_company = function(company_name) {
     
     slider_remove_company(company_name);
     this.update_chart_lines();
+    //this.update_chart_domain();
 }
 
 Model.prototype.get_color = function(company_name) {
@@ -117,6 +119,8 @@ Model.prototype.update_chart_height = function() {
 
 Model.prototype.update_chart_domain = function(extent) {
     Chart.prototype.x.domain(extent);
+    
+    
     for (chart in this.charts) {
         this.charts[chart].update_chart_domain();
     }

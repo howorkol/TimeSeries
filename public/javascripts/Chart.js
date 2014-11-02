@@ -33,10 +33,10 @@ Chart.prototype.make_chart = function() {
         .attr('width',  $(chart_container).width())
         .attr('height', this.height)
         .on('mousemove', function() {
-            var x0 = x.invert(d3.mouse(this)[0] - margin.left);
+            //var x0 = x.invert(d3.mouse(this)[0] - margin.left);
             //var bisectDate = d3.bisector(function(d) { return d[0]; }).left;
             //var i = bisectDate(data, x0, 1);    
-            console.log(x0);
+            //console.log(x0);
         });
     
     // The clip path area is where is chart is allowed to show through.
@@ -245,6 +245,7 @@ Chart.prototype.update_chart_lines = function() {
     // Since companies have been added or removed, the domain
     // of the slider may have changed.
     update_slider_domain();
+    this.update_xAxis();
 };
 
 /*
@@ -252,11 +253,19 @@ Chart.prototype.update_chart_lines = function() {
     domain, as well as changes the xAxis to only show the ticks
     within the domain shown.
 */
-Chart.prototype.update_chart_domain = function() {
+Chart.prototype.update_chart_domain = function(len) {
     var line = this.line;
     this.chart_group.selectAll(".line")
         .attr("d", line);
-    this.chart_group.select(".x.axis").call(this.xAxis);
+    this.chart_group.select(".x.axis")
+        .call(this.xAxis);
+}
+
+Chart.prototype.update_xAxis = function() {
+    this.chart_group.select(".x.axis")
+        .transition()
+        .duration(500)
+        .call(this.xAxis);
 }
 
 /*
