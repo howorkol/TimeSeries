@@ -24,20 +24,44 @@ Chart.prototype.make_chart = function() {
     this.width = $(chart_container).width();
     var chart_height = this.height - margin.top - margin.bottom;
     var chart_width = this.width - margin.left - margin.right;
+    var getYatX = this.getYatX;
+    var attribute = this.attribute;
+    var x;
     
     // Create the svg element to hold everything.
-    this.svg = d3.select(chart_container)
+    var svg = this.svg = d3.select(chart_container)
         .append('li')
         .attr('id', this.attribute)
         .append('svg')
         .attr('width',  $(chart_container).width())
         .attr('height', this.height)
         .on('mousemove', function() {
-            //var x0 = x.invert(d3.mouse(this)[0] - margin.left);
-            //var bisectDate = d3.bisector(function(d) { return d[0]; }).left;
-            //var i = bisectDate(data, x0, 1);    
-            //console.log(x0);
+            var x_coor = d3.mouse(this)[0] - margin.left;
+            if (x_coor < 0) {
+                svg.select('line').style('opacity', 0);
+                return null;
+            }
+            svg.select('line').style('opacity', 1);
+            
+            var x0 = x.invert(x_coor);
+            svg.select('line').attr('transform', 
+                    'translate(' + (margin.left + x(x0)) + ',' + margin.top + ')');
+            for (var i in model.get_company_list()) {
+                var data = model.get_data(attribute, model.get_company_name(i));
+                var y0 = getYatX(data, x0);
+                console.log(model.get_company_name(i), y0);
+            }
+        })
+        .on('mouseleave', function() {
+            svg.select('line').style('opacity', 0);
         });
+    
+    this.svg.append('line')
+        .attr('class', 'xLine')
+        .style('opacity', 0)
+        .attr('y1', 0)
+        .attr('y2', chart_height)
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
     
     // The clip path area is where is chart is allowed to show through.
     // When the user selects an area with the slider, the line widths are
@@ -57,7 +81,7 @@ Chart.prototype.make_chart = function() {
 
     // Grab and set the x domain. Either set to the full date range
     // or the extent under the brush.
-    var x = this.x.domain(brush.empty() 
+    x = this.x.domain(brush.empty() 
             ? model.date_range() 
             : brush.extent())
         .range([1, chart_width]);
@@ -151,6 +175,10 @@ Chart.prototype.update_chart_height = function() {
     this.svg.select('defs rect')
         .transition().duration(this.transition_dur)
         .attr('height', this.height);
+    // Update xLine
+    this.svg.select('line.xLine')
+        .transition().duration(this.transition_dur)
+        .attr('y2', this.height);
     // Update the position of the xAxis.
     this.chart_group.select('.x.axis')
         .transition().duration(this.transition_dur)
@@ -278,3 +306,15 @@ Chart.prototype.set_height = function() {
             ? (total_height / model.get_num_attributes()) - 7
             : this.min_chart_height;
 };
+
+Chart.prototype.getYatX = function(data, date) {
+    for (var i in data) {
+        i = parseInt(i);
+        if (date >= data[i][0]) {
+            return (Math.abs(date - data[i][0]) <= 
+                    Math.abs(date - data[i - 1][0])) 
+                    ? data[i][1] 
+                    : data[i - 1][1];
+        }
+    }
+}

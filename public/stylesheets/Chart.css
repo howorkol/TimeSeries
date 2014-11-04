@@ -31,3 +31,7 @@ div#charts .axis.x {
     shape-rendering: crispEdges;
 }
 
+line.xLine {
+    stroke: #000;
+    stroke-width: 1px;
+}

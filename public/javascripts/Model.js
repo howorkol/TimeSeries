@@ -27,7 +27,10 @@ Model.prototype.get_company_name = function(index) {
 }
 
 Model.prototype.get_data = function(attribute_name, company_name) {
-    return this.attribute_data[attribute_name][company_name];
+    if (company_name)
+        return this.attribute_data[attribute_name][company_name];
+    else
+        return this.attribute_data[attribute_name];
 }
 
 Model.prototype.add_chart = function(attribute_name, chart) {
