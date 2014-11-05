@@ -8,6 +8,8 @@ var Model = function() {
     ];
     this.used_colors = {};
     $('div#slider svg').remove();
+    
+    this.data = {};
 }
 
 Model.prototype.get_num_attributes = function() {
@@ -37,18 +39,28 @@ Model.prototype.add_chart = function(attribute_name, chart) {
     this.charts[attribute_name] = new Chart(attribute_name)
 }
 
-Model.prototype.add_attribute = function(attribute_name, data) {
+Model.prototype.add_attribute = function(attribute_name, new_data) {
     this.attribute_list.push(attribute_name);
     this.attribute_data[attribute_name] = {};
     
-    if (data) {
+    // NEW
+    this.data[attribute_name] = [];
+    // END NEW
+    
+    if (new_data) {
         this.attribute_data[attribute_name] = {};
         for (var i in this.company_list) {
             this.attribute_data[attribute_name][this.company_list[i]] = 
-                    data.map(function(d) {
+                    new_data.map(function(d) {
                 return [d[0], d[parseInt(i) + 1]];
             });
         }
+        
+        // NEW
+       //console.log(new_data);
+        this.data[attribute_name] = new_data;
+        console.log(this.data);
+        // END NEW
     }
     
     this.update_chart_height();
@@ -62,11 +74,16 @@ Model.prototype.delete_attribute = function(attribute_name) {
     delete this.attribute_data[attribute_name];
     delete this.charts[attribute_name];
     
+    // NEW seems to work
+    delete this.data[attribute_name]
+    console.log(this.data);
+    // END NEW
+    
     // Go through the remaining charts and update their heights.
     this.update_chart_height();
 }
 
-Model.prototype.add_company = function(company_name, data) {
+Model.prototype.add_company = function(company_name, new_data) {
     // Add the new company to the company_list and assign it a color.
     this.company_list.push(company_name);
     this.used_colors[company_name] = this.unused_color_list.shift();
@@ -74,8 +91,25 @@ Model.prototype.add_company = function(company_name, data) {
     // Add the data to attribute_data.
     for (var i in this.attribute_list) {
         this.attribute_data[this.attribute_list[i]][company_name] = 
-            data.map(function(d) { return [d[0], d[parseInt(i) + 1]]; });
+            new_data.map(function(d) { return [d[0], d[parseInt(i) + 1]]; });
     }
+    
+    // NEW seems to work
+    // Need to merge arrays.
+    for (var i in this.attribute_list) {
+        var curr_attribute = this.attribute_list[i];
+        
+        for (var j = 0; j < new_data.length; j++) {
+            if (this.data[curr_attribute][j] === undefined) {
+                this.data[curr_attribute][j] = [];
+                this.data[curr_attribute][j]['Date'] = new_data[j]['Date']
+            }
+            this.data[curr_attribute][j][company_name] = new_data[j][curr_attribute];
+        }
+    }
+    console.log(this.data);
+    // END NEW
+    
     
     //slider_add_company(company_name)
     //if (this.company_list.length > 1)
@@ -90,6 +124,17 @@ Model.prototype.delete_company = function(company_name) {
     for (var j in this.attribute_list) {
         delete this.attribute_data[this.attribute_list[j]][company_name];
     }
+    
+    // NEW seems to work
+    for (var j = 0; j < this.attribute_list.length; j++) {
+        var curr_attribute = this.attribute_list[j];
+        for (var k = 0; k < this.data[curr_attribute].length; k++) {
+            delete this.data[curr_attribute][k][company_name];
+            // need to delete array element if no other compnaies have this date.
+        }
+    }
+    console.log(this.data);
+    // END NEW
     
     // Remove the company from company_list.
     this.unused_color_list.unshift(this.used_colors[company_name]);

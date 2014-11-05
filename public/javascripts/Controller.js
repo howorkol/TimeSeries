@@ -22,17 +22,30 @@ function add_company(company_info, callback) {
         query += 'WIKI.' + company_info.ticker + '.' + init_attribute + auth_token;
         
         d3.json(query, function(err, data) {
+        //d3.csv(query, function(err, data) {
+        
             if (err) {
                 callback(err);
                 p.remove();
                 return;
             }
             
+            // NEW Works so far
+            data.data.forEach(function(d) {
+                d['Date'] = parseDate(d[0]);
+                d[0] = parseDate(d[0]); // will remove
+                //delete d[0];
+                d[company_info.ticker] = +d[1];
+                d[1] = +d[1]; // will remove
+                //delete d[1];
+            });
+            // END NEW
+            
+            /*
             data.data.forEach(function(d) {
                 d[0] = parseDate(d[0]);
                 d[1] = +d[1];
-            });
-            
+            });*/
             
             model.add_attribute(init_attribute);
             model.add_company(company_info.ticker, data.data);
@@ -67,6 +80,22 @@ function add_company(company_info, callback) {
                 return;
             }
             
+            // NEW works so far
+            data.data.forEach(function(d) {
+                d['Date'] = parseDate(d[0]);
+                d[0] = parseDate(d[0]); // will remove
+                //delete d[0];
+                for (var i = 1; i <= model.get_num_attributes(); i++) {
+                    if (d[i] !== null) {
+                        d[model.attribute_list[i - 1]] = +d[i];
+                        d[i] = +d[i]; // will remove
+                        //delete d[i];
+                    }
+                }
+            });
+            // END NEW
+            
+            /*
             // Go thru the response. Parse the date and value.
             data.data.forEach(function(d) {
                 d[0] = parseDate(d[0]);
@@ -75,7 +104,7 @@ function add_company(company_info, callback) {
                         d[i] = +d[i];
                     }
                 }
-            });
+            });*/
             
             model.add_company(company_info.ticker, data.data);
             slider_add_company(company_info.ticker);
@@ -165,6 +194,19 @@ function add_attribute(attribute_name, callback) {
             callback(err);
             return;
         }
+        
+        // NEW seems to be working
+        data.data.forEach(function(d) {
+            d['Date'] = parseDate(d[0]);
+            // delete d[0];
+            for (var i = 1; i <= model.get_num_attributes(); i++) {
+                if (d[i] !== null) {
+                    d[model.company_list[i - 1]] = +d[i];
+                    // delete d[i];
+                }
+            }
+        });
+        // END NEW
         
         // Go thru the response. Parse the date and value.
         data.data.forEach(function(d) {

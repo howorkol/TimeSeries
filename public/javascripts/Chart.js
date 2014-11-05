@@ -36,7 +36,7 @@ Chart.prototype.make_chart = function() {
         .attr('width',  $(chart_container).width())
         .attr('height', this.height)
         .on('mousemove', function() {
-            var x_coor = d3.mouse(this)[0] - margin.left;
+            var x_coor = d3.mouse(this)[0] - margin.left - 1;
             if (x_coor < 0) {
                 svg.select('line').style('opacity', 0);
                 return null;

@@ -1,4 +1,4 @@
-.axis path, .axis line {
+.axis path, .axis line, line.xLine {
     fill: none;
     stroke-width: 1.0px;
     shape-rendering: crispEdges;
@@ -32,6 +32,5 @@ div#charts .axis.x {
 }
 
 line.xLine {
-    stroke: #000;
-    stroke-width: 1px;
+    stroke: #747474;
 }
