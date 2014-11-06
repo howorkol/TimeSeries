@@ -81,10 +81,15 @@ Chart.prototype.make_chart = function() {
 
     // Grab and set the x domain. Either set to the full date range
     // or the extent under the brush.
-    x = this.x.domain(brush.empty() 
+   /* x = this.x.domain(brush.empty() 
             ? model.date_range() 
             : brush.extent())
-        .range([1, chart_width]);
+        .range([1, chart_width]);*/
+    
+    // TEST
+    x = this.x.domain(model.date_range()).range([1, chart_width]);
+    // END TEST
+    
     // Grab and set the y domain and range. The domain depends on the 
     // data for this attribute, range depends on chart height.
     var y = this.y = d3.scale.linear()
@@ -146,7 +151,7 @@ Chart.prototype.make_chart = function() {
     
     // This attribute may contain a large range of dates than previous
     // attributes. Update the slider to reflect this.
-    update_slider_domain();
+    //update_slider_domain();
 }
 
 /*
@@ -203,11 +208,16 @@ Chart.prototype.update_chart_lines = function() {
     // have changed it's extent.
     
     // MAY BE ABLE TO REMOVE
-    var x = this.x.domain(
+    /*var x = this.x.domain(
         brush.empty() 
             ? model.date_range() 
             : brush.extent()
-    );
+    );*/
+    
+    // TEST
+    var x = this.x.domain(model.date_range());
+    // END TEST
+    
     // Sets the y domain for this attribute. Since a company has
     // been added or removed the y domain may have changed.
     var y = this.y.domain(model.value_range(this.attribute)).nice();
@@ -272,7 +282,7 @@ Chart.prototype.update_chart_lines = function() {
     
     // Since companies have been added or removed, the domain
     // of the slider may have changed.
-    update_slider_domain();
+    //update_slider_domain();
     this.update_xAxis();
 };
 
