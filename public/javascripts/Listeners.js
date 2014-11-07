@@ -55,7 +55,7 @@ $('div#visualizations ul').sortable({
         $('i#trash').removeClass('fa-trash-o');
         $('i#trash').addClass('fa-trash');
         
-        //update_slider($('ul li:first-child').attr('id'));
+        update_slider($('ul li:first-child').attr('id'));
     }
 });
 

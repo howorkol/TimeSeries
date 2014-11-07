@@ -63,6 +63,7 @@ Model.prototype.add_attribute = function(attribute_name, new_data) {
         for (var i = 0; i < this.company_list.length; i++) {
             this.data[attribute_name][i] = {
                 'company': this.company_list[i],
+                'color'  : this.get_color(this.company_list[i]),
                 'values' : new_data.map(function(d) {
                     return { 'date': d[0], 'value': d[i + 1] };
                     //return { 'date': parseDate(d[0]), 'value': d[i + 1] };
@@ -109,6 +110,7 @@ Model.prototype.add_company = function(company_name, new_data) {
     for (var i = 0; i < this.attribute_list.length; i++) {
         this.data[this.attribute_list[i]][this.company_list.length - 1] = {
             'company': company_name,
+            'color'  : this.get_color(company_name),
             'values' : new_data.map(function(d) {
                 return { 'date': d[0], 'value': d[i + 1] };
                 //return { 'date': parseDate(d[0]), 'value': d[i + 1] };
@@ -148,7 +150,7 @@ Model.prototype.delete_company = function(company_name) {
     //var i = this.company_list.indexOf(company_name);
     this.company_list.splice(company_index, 1);
     
-    slider_remove_company(company_name);
+    //slider_remove_company(company_name);
     this.update_chart_lines();
     //this.update_chart_domain();
 }
@@ -186,10 +188,10 @@ Model.prototype.date_range = function() {
     for (var attribute in this.data) {
         for (var i = 0; i < this.data[attribute].length; i++) {
             var local_min = d3.min(this.data[attribute][i]['values'], function(d) {
-                return d['date'];
+                if (d['value'] !== null) return d['date'];
             });
             var local_max = d3.max(this.data[attribute][i]['values'], function(d) {
-                return d['date'];
+                if (d['value'] !== null) return d['date'];
             });
             if ((min == undefined) || (local_min < min)) min = local_min;
             if ((max == undefined) || (local_max > max)) max = local_max;
@@ -222,10 +224,10 @@ Model.prototype.value_range = function(attribute) {
     for (var i = 0; i < this.company_list.length; i++) {
         var curr_company = this.company_list[i];
         var local_min = d3.min(this.data[attribute][i]['values'], function(d) {
-            return d['value'];
+            if (d['value'] !== null) return d['value'];
         });
         var local_max = d3.max(this.data[attribute][i]['values'], function(d) {
-            return d['value'];
+            if (d['value'] !== null) return d['value'];
         });
         if ((min == undefined) || (local_min < min)) min = local_min;
         if ((max == undefined) || (local_max > max)) max = local_max;

@@ -36,9 +36,8 @@ function add_company(company_info, callback) {
             
             model.add_attribute(init_attribute);
             model.add_company(company_info.ticker, data.data);
-            //create_slider();
+            create_slider();
             model.add_chart(init_attribute);
-            //slider_add_company(company_info.ticker);
             
             p.attr('title', company_info.name)
                 .style('color', model.get_color(company_info.ticker))
@@ -78,7 +77,7 @@ function add_company(company_info, callback) {
             });
             
             model.add_company(company_info.ticker, data.data);
-            //slider_add_company(company_info.ticker);
+            update_slider();
             
             p.attr('title', company_info.name)
                 .style('color', function() {
@@ -97,7 +96,6 @@ function add_company(company_info, callback) {
                     var comp = $(this).attr('id');
                     delete_company(comp, function() {
                         $('p.company i#' + comp).parent().remove();
-                        //click_company_name(company_info.ticker);
                     });
                 });
             
@@ -147,7 +145,7 @@ function add_company(company_info, callback) {
 
 function delete_company(company_name, callback) {
     model.delete_company(company_name);
-    //update_slider_domain();
+    update_slider();
     callback();
 }
 
