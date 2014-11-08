@@ -29,11 +29,6 @@ function add_company(company_info, callback) {
                 return;
             }
             
-            data.data.forEach(function(d) {
-                d[0] = parseDate(d[0]);
-                d[1] = +d[1];
-            });
-            
             model.add_attribute(init_attribute);
             model.add_company(company_info.ticker, data.data);
             create_slider();
@@ -65,16 +60,6 @@ function add_company(company_info, callback) {
                 p.remove();
                 return;
             }
-            
-            // Go thru the response. Parse the date and value.
-            data.data.forEach(function(d) {
-                d[0] = parseDate(d[0]);
-                for (var i = 1; i <= model.get_num_attributes(); i++) {
-                    if (d[i] !== null) {
-                        d[i] = +d[i];
-                    }
-                }
-            });
             
             model.add_company(company_info.ticker, data.data);
             update_slider();
@@ -163,16 +148,6 @@ function add_attribute(attribute_name, callback) {
             callback(err);
             return;
         }
-        
-        // Go thru the response. Parse the date and value.
-        data.data.forEach(function(d) {
-            d[0] = parseDate(d[0]);
-            for (var i = 1; i <= model.get_num_attributes(); i++) {
-                if (d[i] !== null) {
-                    d[i] = +d[i];
-                }
-            }
-        });
         
         model.add_attribute(attribute_name, data.data);
         model.add_chart(attribute_name);

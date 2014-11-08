@@ -24,7 +24,7 @@ function create_slider() {
     // When a brush event occurs, call the 'brushed' function.
     brush = d3.svg.brush('div#slider').x(s_x)
         .on("brush", function() {
-            model.update_chart_domain(brush.empty() ? model.date_range() : brush.extent());
+            model.slider_event();
         });
     
     // Get the width and height for the slider.
@@ -76,6 +76,7 @@ function update_slider(top_element) {
     // removed. If curr_slider_attribute is still the top-most chart, 
     // return. Otherwise, remove all lines from the chart and set the new
     // curr_slider_attribute. If top_element unset, ignore.
+    var extent = brush.extent();
     if (top_element === curr_slider_attribute) return;
     else if (top_element) {
         svg.selectAll('g.company').remove();
@@ -114,8 +115,7 @@ function update_slider(top_element) {
         .call(s_xAxis);
     
     // The brush maintains the same extent on the slider.
-    brush.extent(brush.extent());
+    brush.extent(extent);
     brush(d3.select('.brush').transition().duration(500));
-    // not working
-    //model.update_chart_domain(brush.empty() ? model.date_range() : brush.extent());
+    model.update_charts();
 }

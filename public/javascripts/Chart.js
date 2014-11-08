@@ -34,7 +34,7 @@ Chart.prototype.make_chart = function() {
         .attr('id', this.attribute)
         .append('svg')
         .attr('width',  $(chart_container).width())
-        .attr('height', this.height)
+        .attr('height', this.height);/*
         .on('mousemove', function() {
             var x_coor = d3.mouse(this)[0] - margin.left - 1;
             if (x_coor < 0) {
@@ -61,7 +61,7 @@ Chart.prototype.make_chart = function() {
         .style('opacity', 0)
         .attr('y1', 0)
         .attr('y2', chart_height)
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');*/
     
     // The clip path area is where is chart is allowed to show through.
     // When the user selects an area with the slider, the line widths are
@@ -79,16 +79,7 @@ Chart.prototype.make_chart = function() {
         .attr('id', this.attribute)
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    // Grab and set the x domain. Either set to the full date range
-    // or the extent under the brush.
-   /* x = this.x.domain(brush.empty() 
-            ? model.date_range() 
-            : brush.extent())
-        .range([1, chart_width]);*/
-    
-    // TEST
-    x = this.x.domain(model.date_range()).range([1, chart_width]);
-    // END TEST
+    var x = this.x.domain(model.date_range()).range([1, chart_width]);
     
     // Grab and set the y domain and range. The domain depends on the 
     // data for this attribute, range depends on chart height.
@@ -96,11 +87,10 @@ Chart.prototype.make_chart = function() {
         .domain(model.value_range(this.attribute))
         .range([chart_height, 0]).nice();
     
-    // Define the line function used for this attribute.
-    var line = this.line = d3.svg.line()
-        .defined(function(d) { return d[1] != null; })
-        .x(function(d) { return Chart.prototype.x(d[0]); })
-        .y(function(d) { return y(d[1]); });
+    this.line = d3.svg.line()
+        .defined(function(d) { return d['value'] != null; })
+        .x(function(d) { return x(d['date']); })
+        .y(function(d) { return y(d['value']); });
     
     // Set the attributes for the x and y axis.
     this.xAxis = d3.svg.axis().scale(this.x).orient('bottom')
@@ -111,13 +101,11 @@ Chart.prototype.make_chart = function() {
     // Append the x axis.
     this.chart_group.append('g')
         .attr('class', 'x axis')
-        .call(this.xAxis)
         .attr('transform', 'translate(0,' + chart_height + ')');
     
     // Append the y axis.
     this.chart_group.append('g')
         .attr('class', 'y axis')
-        .call(this.yAxis)
         .append('text')
         .attr('transform', 'rotate(-90)')
         .attr('y', 6)
@@ -131,27 +119,62 @@ Chart.prototype.make_chart = function() {
         .attr('class', 'line_group')
         .attr('clip-path', 'url(#clip_' + this.attribute + ')');
     
-    // Got through the data for this attribute and add a line
-    // for each company.
-    for (index in model.get_company_list()) {
-        this.line_group.append("path")
-            .datum(model.get_data(this.attribute, model.get_company_name(index)))
-            .attr("class", "line")
-            .attr('id', model.get_company_name(index))
-            .attr("d", line)
-            .attr('stroke', function() {
-                if (selected_company == null || selected_company == model.get_company_name(index))
-                    return model.get_color(model.get_company_name(index));
-                else 
-                    return deselected_color;
-            });
-            //.attr('stroke', model.get_color(model.get_company_name(index)));
-        this.plotted_companies.push(model.get_company_name(index));
-    }
+    this.update_chart();
+}
+
+Chart.prototype.update_chart = function() {
+    var chart_height = this.height - margin.top  - margin.bottom;
+    var chart_width  = this.width  - margin.left - margin.right;
+    var line = this.line;
+
+    // Set the chart domain and range as it may have changed. 
+    this.x.domain(brush.empty() 
+            ? model.date_range() 
+            : brush.extent());
+    this.y.domain(model.value_range(this.attribute))
+        .range([chart_height, 0]).nice();
     
-    // This attribute may contain a large range of dates than previous
-    // attributes. Update the slider to reflect this.
-    //update_slider_domain();
+    var companies = this.line_group.selectAll('g.company')
+        .data(model.data[this.attribute], function(d) {
+            return d.company;
+        });
+    // Enter the data. Applies to newly added lines.
+    var enter = companies.enter()
+        .append('g').attr('class', 'company')
+        .append('path').attr('class', 'line')
+        .attr('id', function(d) { return d.company; })
+        .attr('d', function(d) { return line(d.values); })
+        .attr('stroke', function(d) { return d.color; })
+        .attr('stroke-opacity', 0);
+    // Applied to all lines.
+    companies.selectAll('path')
+        .transition().duration(500)
+        .attr('d', function(d) { return line(d.values); })
+        .attr('stroke-opacity', 1);
+    // Remove lines that no longer have data.
+    companies.exit().remove();
+    
+    // Update the axes.
+    this.xAxis.tickSize(-(this.height - margin.top - margin.bottom), 0, 0);
+    this.chart_group.select(".x.axis")
+        .transition().duration(500)
+        .attr('transform', 'translate(0,' + (this.height - margin.top - margin.bottom) + ')')
+        .call(this.xAxis);
+    this.chart_group.select('.y.axis')
+        .transition().duration(this.transition_dur)
+        .call(this.yAxis);
+}
+
+Chart.prototype.quick_update = function() {
+    var line = this.line;
+    this.x.domain(brush.empty() 
+            ? model.date_range() 
+            : brush.extent());
+    
+    this.line_group.selectAll('g.company path')
+        .attr('d', function(d) { return line(d.values); });
+    this.chart_group.select(".x.axis")
+        .call(this.xAxis);
 }
 
 /*
@@ -160,21 +183,12 @@ Chart.prototype.make_chart = function() {
 */
 Chart.prototype.update_chart_height = function() {
     // Get and set the y range to reflect the new height.
-    var y = this.y.range([this.height - margin.top - margin.bottom, 0]);
-    // Get the x and line. 
+    var y = this.y.range([this.height - margin.top - margin.bottom, 0]).nice();
     var x = this.x;
     var line = this.line;
     
-    // Update the xAxis tick lines. As the chart is resized, the tick lines
-    // need to be lengthened or shortened to maintain the full chart height.
-    this.xAxis.tickSize(-(this.height - margin.top - margin.bottom), 0, 0);
-    // Call the xAxis to reflect the change in tickSize.
-    this.chart_group.select(".x.axis")
-        .transition().duration(this.transition_dur)
-        .call(this.xAxis);
     // Update the svg height.
-    this.svg
-        .transition().duration(this.transition_dur)
+    this.svg.transition().duration(this.transition_dur)
         .attr('height', this.height);
     // Update the clip path height.
     this.svg.select('defs rect')
@@ -184,127 +198,7 @@ Chart.prototype.update_chart_height = function() {
     this.svg.select('line.xLine')
         .transition().duration(this.transition_dur)
         .attr('y2', this.height);
-    // Update the position of the xAxis.
-    this.chart_group.select('.x.axis')
-        .transition().duration(this.transition_dur)
-        .attr('transform', 'translate(0,' + (this.height - margin.top - margin.bottom) + ')');
-    // Update the yAxis as the range has changed.
-    this.chart_group.select('.y')
-        .transition().duration(this.transition_dur)
-        .call(this.yAxis);
-    // Update all lines to reflect the change in y range.
-    this.chart_group.selectAll('.line')
-        .transition().duration(this.transition_dur)
-        .attr('d', line);
 };
-
-/*
-    This function updates the lines on the chart. That is,
-    adds new lines if new companies are available, and removes
-    lines when companies have been removed.
-*/
-Chart.prototype.update_chart_lines = function() {
-    // Get and set the x domain. Useful as the slider may
-    // have changed it's extent.
-    
-    // MAY BE ABLE TO REMOVE
-    /*var x = this.x.domain(
-        brush.empty() 
-            ? model.date_range() 
-            : brush.extent()
-    );*/
-    
-    // TEST
-    var x = this.x.domain(model.date_range());
-    // END TEST
-    
-    // Sets the y domain for this attribute. Since a company has
-    // been added or removed the y domain may have changed.
-    var y = this.y.domain(model.value_range(this.attribute)).nice();
-    var line = this.line;
-    
-    // Update the yAxis to reflect the new domain.
-    this.chart_group.select('.y')
-        .transition().duration(this.transition_dur)
-        .call(this.yAxis);
-    // Also update the lines to reflect the new y domain.
-    this.chart_group.selectAll('.line')
-        .transition().duration(this.transition_dur)
-        .attr('d', line);
-
-    // Gets a list of all companies either plotted on the 
-    // chart, or that there is data for. The point is that if a
-    // company is on the chart but no data exists for it, it gets
-    // removed. If there is data for a company not on the chart, it
-    // gets added.
-    var companies = [];
-    $.each(model.get_company_list(), function(i, el) {
-        companies.push(el);
-    });
-    $.each(this.plotted_companies, function(i, el) {
-        if ($.inArray(el, companies) === -1) companies.push(el);
-    });
-    
-    // Get local copies for these as 'this' has strange contexts.
-    var plotted_companies = this.plotted_companies;
-    var line_group = this.line_group;
-    var attribute = this.attribute;
-    var transition_dur = this.transition_dur;
-    
-    // Go through all the companies in the companies list.
-    $.each(companies, function(i, el) {
-        // If the company isn't yet plotted on this chart, add it.
-        if ($.inArray(el, plotted_companies) === -1) {
-            line_group.append("path")
-                .datum(model.get_data(attribute, el))
-                .attr("class", "line")
-                .attr('id', el)
-                .attr("d", line)
-                .attr('stroke', function() {
-                    if (selected_company == null || selected_company == el)
-                        return model.get_color(el);
-                    else 
-                        return deselected_color;
-                })
-                .attr('stroke-opacity', 0)
-                .transition()
-                .duration(transition_dur)
-                .attr('stroke-opacity', 1);
-            plotted_companies.push(el);
-        }
-        else if ($.inArray(el, model.get_company_list()) === -1) {
-            // If there is no data for this company it gets removed.
-            line_group.select('path#' + el).remove();
-            var i = plotted_companies.indexOf(el);
-            plotted_companies.splice(i, 1);
-        }
-    });
-    
-    // Since companies have been added or removed, the domain
-    // of the slider may have changed.
-    //update_slider_domain();
-    this.update_xAxis();
-};
-
-/*
-    Called when the slider extent changes. Updates all charts
-    domain, as well as changes the xAxis to only show the ticks
-    within the domain shown.
-*/
-Chart.prototype.update_chart_domain = function(len) {
-    var line = this.line;
-    this.chart_group.selectAll(".line")
-        .attr("d", line);
-    this.chart_group.select(".x.axis")
-        .call(this.xAxis);
-}
-
-Chart.prototype.update_xAxis = function() {
-    this.chart_group.select(".x.axis")
-        .transition()
-        .duration(500)
-        .call(this.xAxis);
-}
 
 /*
     Sets the height of the Chart prototype variable. Since all charts
