@@ -6,7 +6,7 @@ var Chart = function(attribute) {
 };
 
 var chart_container = 'div#visualizations div#charts ul';
-var margin = {top: 7, right: 0, bottom: 20, left: 65, s_bottom: 20};
+var margin = {top: 3, right: 0, bottom: 15, left: 65, s_bottom: 20};
 
 Chart.prototype.min_chart_height = 150;
 Chart.prototype.x = d3.time.scale();
@@ -34,34 +34,36 @@ Chart.prototype.make_chart = function() {
         .attr('id', this.attribute)
         .append('svg')
         .attr('width',  $(chart_container).width())
-        .attr('height', this.height);/*
+        .attr('height', this.height)
         .on('mousemove', function() {
             var x_coor = d3.mouse(this)[0] - margin.left - 1;
             if (x_coor < 0) {
                 svg.select('line').style('opacity', 0);
                 return null;
             }
-            svg.select('line').style('opacity', 1);
+            svg.select('.xLine').style('opacity', 1);
             
             var x0 = x.invert(x_coor);
-            svg.select('line').attr('transform', 
+            svg.select('.xLine').attr('transform', 
                     'translate(' + (margin.left + x(x0)) + ',' + margin.top + ')');
-            for (var i in model.get_company_list()) {
-                var data = model.get_data(attribute, model.get_company_name(i));
+            svg.select('table .date').text(x0);
+            
+            for (var i = 0; i < model.get_company_list().length; i++) {
+                var curr_company = model.get_company_name(i);
+                var data = model.get_data(attribute, curr_company);
                 var y0 = getYatX(data, x0);
-                console.log(model.get_company_name(i), y0);
+                
+                svg.select('table td#' + curr_company)
+                    .text(y0);
             }
+            
+            svg.select('g.tooltip')
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");
         })
         .on('mouseleave', function() {
-            svg.select('line').style('opacity', 0);
+            svg.select('.xLine').style('opacity', 0);
         });
-    
-    this.svg.append('line')
-        .attr('class', 'xLine')
-        .style('opacity', 0)
-        .attr('y1', 0)
-        .attr('y2', chart_height)
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');*/
     
     // The clip path area is where is chart is allowed to show through.
     // When the user selects an area with the slider, the line widths are
@@ -119,6 +121,18 @@ Chart.prototype.make_chart = function() {
         .attr('class', 'line_group')
         .attr('clip-path', 'url(#clip_' + this.attribute + ')');
     
+    this.svg.append('line')
+        .attr('class', 'xLine')
+        .style('opacity', 0)
+        .attr('y1', 0)
+        .attr('y2', chart_height);
+    
+    this.yTable = this.svg.append('g')
+        .attr('class', 'tooltip')
+        .append('table');
+    this.yTable.append('th')
+        .attr('class', 'date');
+
     this.update_chart();
 }
 
@@ -140,19 +154,34 @@ Chart.prototype.update_chart = function() {
         });
     // Enter the data. Applies to newly added lines.
     var enter = companies.enter()
-        .append('g').attr('class', 'company')
-        .append('path').attr('class', 'line')
+        .append('g').attr('class', 'company');
+    enter.append('path').attr('class', 'line')
         .attr('id', function(d) { return d.company; })
         .attr('d', function(d) { return line(d.values); })
         .attr('stroke', function(d) { return d.color; })
         .attr('stroke-opacity', 0);
+    
+    var xLine_data = this.yTable.selectAll('tr')
+        .data(model.data[this.attribute], function(d) {
+            return d.company;
+        });
+    var xLine_tablerow = xLine_data.enter()
+        .append('tr')
+    xLine_tablerow.append('td')
+        .text(function(d) { return d.company; })
+        .style('color', function(d) { return d.color; });
+    xLine_tablerow.append('td')
+        .attr('id', function(d) { return d.company; });
+    
     // Applied to all lines.
     companies.selectAll('path')
         .transition().duration(500)
         .attr('d', function(d) { return line(d.values); })
         .attr('stroke-opacity', 1);
+    
     // Remove lines that no longer have data.
     companies.exit().remove();
+    xLine_data.exit().remove();
     
     // Update the axes.
     this.xAxis.tickSize(-(this.height - margin.top - margin.bottom), 0, 0);
@@ -212,13 +241,12 @@ Chart.prototype.set_height = function() {
 };
 
 Chart.prototype.getYatX = function(data, date) {
-    for (var i in data) {
-        i = parseInt(i);
-        if (date >= data[i][0]) {
-            return (Math.abs(date - data[i][0]) <= 
-                    Math.abs(date - data[i - 1][0])) 
-                    ? data[i][1] 
-                    : data[i - 1][1];
+    for (var i = 0; i < data.length; i++) {
+        if (date >= data[i]['date']) {
+            return (Math.abs(date - data[i]['date']) <= 
+                    Math.abs(date - data[i - 1]['date'])) 
+                ? data[i]['value'] 
+                : data[i - 1]['value'];
         }
     }
 }

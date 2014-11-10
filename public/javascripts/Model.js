@@ -37,6 +37,13 @@ Model.prototype.get_data = function(attribute_name, company_name) {
         return this.attribute_data[attribute_name];
 }*/
 
+Model.prototype.get_data = function(attribute_name, company_name) {
+    for (var i = 0; i < this.data[attribute_name].length; i++) {
+        if (this.data[attribute_name][i].company === company_name)
+            return this.data[attribute_name][i].values;
+    }
+}
+
 Model.prototype.add_chart = function(attribute_name, chart) {
     this.charts[attribute_name] = new Chart(attribute_name)
 }
