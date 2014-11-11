@@ -7,7 +7,7 @@ var parseDate = d3.time.format("%Y-%m-%d").parse;
 var total = 0;
 var model = new Model();
 var selected_company = null;
-var deselected_color = 'rgba(193, 193, 193, 0.61)';
+var deselected_color = 'rgba(222, 222, 222, 0.61)';
 
 function add_company(company_info, callback) {
     

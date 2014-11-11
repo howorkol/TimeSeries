@@ -171,3 +171,15 @@ Model.prototype.value_range = function(attribute) {
     }
     return [min, max];
 }
+
+Model.prototype.getYatX = function(attribute, company, date) {
+    var data = this.get_data(attribute, company);
+    for (var i = 0; i < data.length; i++) {
+        if (date >= data[i]['date']) {
+            return (Math.abs(date - data[i]['date']) <= 
+                    Math.abs(date - data[i - 1]['date'])) 
+                ? data[i]['value'] 
+                : data[i - 1]['value'];
+        }
+    }
+}

@@ -24,7 +24,6 @@ Chart.prototype.make_chart = function() {
     this.width = $(chart_container).width();
     var chart_height = this.height - margin.top - margin.bottom;
     var chart_width = this.width - margin.left - margin.right;
-    var getYatX = this.getYatX;
     var attribute = this.attribute;
     var x;
     
@@ -38,31 +37,27 @@ Chart.prototype.make_chart = function() {
         .on('mousemove', function() {
             var x_coor = d3.mouse(this)[0] - margin.left - 1;
             if (x_coor < 0) {
-                svg.select('line').style('opacity', 0);
+                svg.select('.xline').style('opacity', 0);
+                svg.selectAll('g .yValue, text#xDate').text('');
                 return null;
             }
             svg.select('.xLine').style('opacity', 1);
             
             var x0 = x.invert(x_coor);
+            svg.select('text#xDate')
+                .text(d3.time.format('%a %b %d %Y')(x0));
             svg.select('.xLine').attr('transform', 
-                    'translate(' + (margin.left + x(x0)) + ',' + margin.top + ')');
-            svg.select('table .date').text(x0);
+                    'translate(' + (margin.left + x(x0)) + ',' + (margin.top + 25) + ')');
             
             for (var i = 0; i < model.get_company_list().length; i++) {
                 var curr_company = model.get_company_name(i);
-                var data = model.get_data(attribute, curr_company);
-                var y0 = getYatX(data, x0);
-                
-                svg.select('table td#' + curr_company)
-                    .text(y0);
+                svg.select('g#' + curr_company + ' .yValue')
+                    .text(model.getYatX(attribute, curr_company, x0));
             }
-            
-            svg.select('g.tooltip')
-                .style("left", (d3.event.pageX) + "px")     
-                .style("top", (d3.event.pageY - 28) + "px");
         })
         .on('mouseleave', function() {
             svg.select('.xLine').style('opacity', 0);
+            svg.selectAll('g .yValue, text#xDate').text('');
         });
     
     // The clip path area is where is chart is allowed to show through.
@@ -87,7 +82,7 @@ Chart.prototype.make_chart = function() {
     // data for this attribute, range depends on chart height.
     var y = this.y = d3.scale.linear()
         .domain(model.value_range(this.attribute))
-        .range([chart_height, 0]).nice();
+        .range([chart_height, 25]).nice();
     
     this.line = d3.svg.line()
         .defined(function(d) { return d['value'] != null; })
@@ -109,10 +104,11 @@ Chart.prototype.make_chart = function() {
     this.chart_group.append('g')
         .attr('class', 'y axis')
         .append('text')
-        .attr('transform', 'rotate(-90)')
+        .attr('transform', 'rotate(-90), translate(' + 
+              (((-chart_height) / 2) + 12) + ', -50)')
         .attr('y', 6)
         .attr('dy', '.71em')
-        .style('text-anchor', 'end')
+        .style('text-anchor', 'middle')
         .text(this.attribute);
 
     // Create and append a line group. Used for easy access to
@@ -125,14 +121,14 @@ Chart.prototype.make_chart = function() {
         .attr('class', 'xLine')
         .style('opacity', 0)
         .attr('y1', 0)
-        .attr('y2', chart_height);
+        .attr('y2', chart_height - 25);
     
-    this.yTable = this.svg.append('g')
-        .attr('class', 'tooltip')
-        .append('table');
-    this.yTable.append('th')
-        .attr('class', 'date');
-
+    this.svg.append('text')
+        .attr('id', 'xDate')
+        .attr('font-size', '.9em')
+        .attr('transform', 'translate(' + (chart_width + margin.left - 6) + ', 20)')
+        .attr('text-anchor', 'end');
+    
     this.update_chart();
 }
 
@@ -146,7 +142,7 @@ Chart.prototype.update_chart = function() {
             ? model.date_range() 
             : brush.extent());
     this.y.domain(model.value_range(this.attribute))
-        .range([chart_height, 0]).nice();
+        .range([chart_height, 25]).nice();
     
     var companies = this.line_group.selectAll('g.company')
         .data(model.data[this.attribute], function(d) {
@@ -160,31 +156,37 @@ Chart.prototype.update_chart = function() {
         .attr('d', function(d) { return line(d.values); })
         .attr('stroke', function(d) { return d.color; })
         .attr('stroke-opacity', 0);
-    
-    var xLine_data = this.yTable.selectAll('tr')
-        .data(model.data[this.attribute], function(d) {
-            return d.company;
+    var yValue_group = enter.append('g').attr('class', 'yValue_group')
+        .attr('id', function(d) { return d.company; })
+        .attr('fill', function(d) { return d.color; })
+        .attr('font-size', '.9em')
+        .attr('transform', function(d, i) {
+            return 'translate(' + (i * chart_width / 10) + ',10)';
         });
-    var xLine_tablerow = xLine_data.enter()
-        .append('tr')
-    xLine_tablerow.append('td')
-        .text(function(d) { return d.company; })
-        .style('color', function(d) { return d.color; });
-    xLine_tablerow.append('td')
-        .attr('id', function(d) { return d.company; });
+    yValue_group.append('text')
+        .text(function(d) { return d.company; });
+    yValue_group.append('text')
+        .attr('class', 'yValue')
+        .attr('transform', 'translate(0, 13)')
+        .attr('fill', 'black');
     
     // Applied to all lines.
     companies.selectAll('path')
         .transition().duration(500)
         .attr('d', function(d) { return line(d.values); })
         .attr('stroke-opacity', 1);
+    companies.selectAll('.yValue_group')
+        .transition().duration(500)
+        .attr('transform', function(d) {
+            return 'translate(' + (model.get_company_list().indexOf(d.company) 
+                                   * chart_width / 10) + ',10)';
+        });
     
     // Remove lines that no longer have data.
     companies.exit().remove();
-    xLine_data.exit().remove();
     
     // Update the axes.
-    this.xAxis.tickSize(-(this.height - margin.top - margin.bottom), 0, 0);
+    this.xAxis.tickSize(-(this.height - margin.top - margin.bottom) + 25, 0, 0);
     this.chart_group.select(".x.axis")
         .transition().duration(500)
         .attr('transform', 'translate(0,' + (this.height - margin.top - margin.bottom) + ')')
@@ -192,6 +194,10 @@ Chart.prototype.update_chart = function() {
     this.chart_group.select('.y.axis')
         .transition().duration(this.transition_dur)
         .call(this.yAxis);
+    this.chart_group.select('.y.axis > text')
+        .transition().duration(this.transition_dur)
+        .attr('transform', 'rotate(-90), translate(' + 
+             (((-chart_height) / 2) - 12) + ', -50)');
 }
 
 Chart.prototype.quick_update = function() {
@@ -212,7 +218,7 @@ Chart.prototype.quick_update = function() {
 */
 Chart.prototype.update_chart_height = function() {
     // Get and set the y range to reflect the new height.
-    var y = this.y.range([this.height - margin.top - margin.bottom, 0]).nice();
+    var y = this.y.range([this.height - margin.top - margin.bottom, 25]).nice();
     var x = this.x;
     var line = this.line;
     
@@ -239,14 +245,3 @@ Chart.prototype.set_height = function() {
             ? (total_height / model.get_num_attributes()) - 7
             : this.min_chart_height;
 };
-
-Chart.prototype.getYatX = function(data, date) {
-    for (var i = 0; i < data.length; i++) {
-        if (date >= data[i]['date']) {
-            return (Math.abs(date - data[i]['date']) <= 
-                    Math.abs(date - data[i - 1]['date'])) 
-                ? data[i]['value'] 
-                : data[i - 1]['value'];
-        }
-    }
-}
