@@ -105,8 +105,10 @@ $('div#compare_cont > div').click(function () {
 
 $('input#add').click(function() {
     add_attribute(total.toString(), function(err) {
-        var full_height = $('div#charts ul').height() - $('div#charts').height();
-        $('div#charts').animate({scrollTop: full_height}, 'slow');
+        
+        //var full_height = $('div#charts ul').height() - $('div#charts').height();
+        //var full_height = model.get_num_attributes() * Chart.prototype.height;
+        //$('div#charts').animate({scrollTop: full_height}, 'slow');
     });
 });
 

@@ -10,6 +10,10 @@ var selected_company = null;
 var deselected_color = 'rgba(222, 222, 222, 0.61)';
 
 function add_company(company_info, callback) {
+    if (model.get_company_list().indexOf(company_info.ticker) > -1) {
+        callback('err');
+        return;
+    }
     
     var p = d3.select('div#visulaization_slide div.secondary_div').append('p')
         .attr('class', 'company');
@@ -97,6 +101,7 @@ function add_company(company_info, callback) {
                 var name = d3.select(this).text();
                 if (name != c) {
                     d3.select(this).style('color', deselected_color);
+                    d3.selectAll('g#' + name).attr('fill', deselected_color);
                     d3.selectAll('path#' + name)
                         .attr('stroke', deselected_color);
                 }
@@ -106,6 +111,7 @@ function add_company(company_info, callback) {
             ps.each(function() {
                 var name = d3.select(this).text();
                 d3.select(this).style('color', model.get_color(name));
+                d3.selectAll('g#' + name).attr('fill', model.get_color(name));
                 d3.selectAll('path#' + name)
                     .attr('stroke', model.get_color(name))
                     .moveToFront();
@@ -116,10 +122,12 @@ function add_company(company_info, callback) {
                 var name = d3.select(this).text();
                 if (name == c) {
                     d3.select(this).style('color', model.get_color(name));
+                    d3.selectAll('g#' + name).attr('fill', model.get_color(name));
                     d3.selectAll('path#' + name).attr('stroke', model.get_color(name))
                         .moveToFront();
                 } else {
                     d3.select(this).style('color', deselected_color);
+                    d3.selectAll('g#' + name).attr('fill', deselected_color);
                     d3.selectAll('path#' + name).attr('stroke', deselected_color);
                 }
             });

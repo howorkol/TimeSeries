@@ -1,18 +1,28 @@
+var chart_container = 'div#visualizations div#charts ul';
+var margin = {top: 3, right: 0, bottom: 15, left: 65, s_bottom: 20};
+
 var Chart = function(attribute) {
     this.attribute = attribute;
+    this.svg = d3.select(chart_container).append('li')
+        .attr('id', this.attribute).append('svg');
     this.plotted_companies = [];
     this.set_height();
     this.make_chart();
 };
-
-var chart_container = 'div#visualizations div#charts ul';
-var margin = {top: 3, right: 0, bottom: 15, left: 65, s_bottom: 20};
 
 Chart.prototype.min_chart_height = 150;
 Chart.prototype.x = d3.time.scale();
 Chart.prototype.width;
 Chart.prototype.height;
 Chart.prototype.transition_dur = 500;
+
+Chart.prototype.set_hover_values = function(x0) {
+     for (var i = 0; i < model.get_company_list().length; i++) {
+        var curr_company = model.get_company_name(i);
+        this.svg.select('g#' + curr_company + ' .yValue')
+            .text(model.getYatX(this.attribute, curr_company, x0));
+    }
+}
 
 /*
     Create a new chart and add it to the page.
@@ -25,40 +35,33 @@ Chart.prototype.make_chart = function() {
     var chart_height = this.height - margin.top - margin.bottom;
     var chart_width = this.width - margin.left - margin.right;
     var attribute = this.attribute;
-    var x;
+    
+    var cursor_out = function() {
+        d3.selectAll('line.xLine').style('opacity', 0);
+        d3.selectAll('g .yValue, text#xDate').text('');
+    }
     
     // Create the svg element to hold everything.
-    var svg = this.svg = d3.select(chart_container)
-        .append('li')
-        .attr('id', this.attribute)
-        .append('svg')
-        .attr('width',  $(chart_container).width())
+    this.svg.attr('width',  $(chart_container).width())
         .attr('height', this.height)
         .on('mousemove', function() {
             var x_coor = d3.mouse(this)[0] - margin.left - 1;
-            if (x_coor < 0) {
-                svg.select('.xline').style('opacity', 0);
-                svg.selectAll('g .yValue, text#xDate').text('');
+            var y_coor = d3.mouse(this)[1] - margin.top - 27;
+            var x0 = x.invert(x_coor);
+            
+            if ((x_coor < 0) || (y_coor < 0)) {
+                cursor_out();
                 return null;
             }
-            svg.select('.xLine').style('opacity', 1);
-            
-            var x0 = x.invert(x_coor);
-            svg.select('text#xDate')
-                .text(d3.time.format('%a %b %d %Y')(x0));
-            svg.select('.xLine').attr('transform', 
-                    'translate(' + (margin.left + x(x0)) + ',' + (margin.top + 25) + ')');
-            
-            for (var i = 0; i < model.get_company_list().length; i++) {
-                var curr_company = model.get_company_name(i);
-                svg.select('g#' + curr_company + ' .yValue')
-                    .text(model.getYatX(attribute, curr_company, x0));
-            }
-        })
-        .on('mouseleave', function() {
-            svg.select('.xLine').style('opacity', 0);
-            svg.selectAll('g .yValue, text#xDate').text('');
-        });
+
+            d3.selectAll('line.xLine').style('opacity', 1)
+                .attr('transform', 'translate(' + (margin.left + x(x0)) + 
+                      ',' + (margin.top + 25) + ')');
+            d3.selectAll('text#xDate').text(d3.time.format('%a %b %d %Y')(x0));
+
+            model.chart_hover(x0);
+        
+        }).on('mouseleave', cursor_out);
     
     // The clip path area is where is chart is allowed to show through.
     // When the user selects an area with the slider, the line widths are
@@ -68,7 +71,7 @@ Chart.prototype.make_chart = function() {
         .attr("id", 'clip_' + this.attribute)
         .append("rect")
         .attr("width", chart_width)
-        .attr("height", chart_height);
+        .attr("height", chart_height + margin.top);    
     
     // Group everything in the chart for easy access. 
     this.chart_group = this.svg.append('g')
@@ -228,11 +231,11 @@ Chart.prototype.update_chart_height = function() {
     // Update the clip path height.
     this.svg.select('defs rect')
         .transition().duration(this.transition_dur)
-        .attr('height', this.height);
+        .attr('height', this.height - margin.bottom);
     // Update xLine
     this.svg.select('line.xLine')
         .transition().duration(this.transition_dur)
-        .attr('y2', this.height);
+        .attr('y2', this.height - margin.top - margin.bottom - 25);
 };
 
 /*

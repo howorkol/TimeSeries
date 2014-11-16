@@ -6,7 +6,7 @@ var Model = function() {
     this.attribute_list = [];
     this.charts = {};
     this.unused_color_list = [
-        '#72abd4', '#60BD68', '#FAA43A', '#F17CB0', '#B276B2', '#DECF3F', '#F15854'
+        '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2'
     ];
     this.used_colors = {};
     $('div#slider svg').remove();
@@ -181,5 +181,11 @@ Model.prototype.getYatX = function(attribute, company, date) {
                 ? data[i]['value'] 
                 : data[i - 1]['value'];
         }
+    }
+}
+
+Model.prototype.chart_hover = function(x0) {
+    for (chart in this.charts) {
+        this.charts[chart].set_hover_values(x0);
     }
 }
