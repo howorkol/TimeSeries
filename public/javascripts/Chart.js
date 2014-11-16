@@ -108,7 +108,7 @@ Chart.prototype.make_chart = function() {
         .attr('class', 'y axis')
         .append('text')
         .attr('transform', 'rotate(-90), translate(' + 
-              (((-chart_height) / 2) + 12) + ', -50)')
+              (((-chart_height) / 2) + 12) + ',0)')
         .attr('y', 6)
         .attr('dy', '.71em')
         .style('text-anchor', 'middle')
@@ -157,11 +157,19 @@ Chart.prototype.update_chart = function() {
     enter.append('path').attr('class', 'line')
         .attr('id', function(d) { return d.company; })
         .attr('d', function(d) { return line(d.values); })
-        .attr('stroke', function(d) { return d.color; })
+        .attr('stroke', function(d) { 
+            if ((selected_company == null) || (selected_company == d.company))
+                return d.color;
+            else return deselected_color;
+        })
         .attr('stroke-opacity', 0);
     var yValue_group = enter.append('g').attr('class', 'yValue_group')
         .attr('id', function(d) { return d.company; })
-        .attr('fill', function(d) { return d.color; })
+        .attr('fill', function(d) { 
+            if ((selected_company == null) || (selected_company == d.company))
+                return d.color;
+            else return deselected_color;
+        })
         .attr('font-size', '.9em')
         .attr('transform', function(d, i) {
             return 'translate(' + (i * chart_width / 10) + ',10)';
@@ -200,7 +208,7 @@ Chart.prototype.update_chart = function() {
     this.chart_group.select('.y.axis > text')
         .transition().duration(this.transition_dur)
         .attr('transform', 'rotate(-90), translate(' + 
-             (((-chart_height) / 2) - 12) + ', -50)');
+             (((-chart_height) / 2) - 12) + ', -65)');
 }
 
 Chart.prototype.quick_update = function() {

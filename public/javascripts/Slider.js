@@ -99,7 +99,11 @@ function update_slider(top_element) {
         .append('path').attr('class', 'line')
         .attr('id', function(d) { return d.company; })
         .attr('d', function(d) { return s_line(d.values); })
-        .attr('stroke', function(d) { return d.color; })
+        .attr('stroke', function(d) {
+            if ((selected_company == null) || (selected_company == d.company))
+                return d.color;
+            else return deselected_color;
+        })
         .attr('stroke-opacity', 0);
     // Applied to all lines.
     companies.selectAll('path')

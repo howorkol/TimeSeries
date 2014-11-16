@@ -83,6 +83,7 @@ function add_company(company_info, callback) {
                 .attr('class', 'fa fa-times')
                 .on('click', function() {
                     var comp = $(this).attr('id');
+                    setTimeout(clear_selected_company, 100);
                     delete_company(comp, function() {
                         $('p.company i#' + comp).parent().remove();
                     });
@@ -92,46 +93,44 @@ function add_company(company_info, callback) {
         });
     }
     
+    function set_selected_company(c) {
+        var ps = d3.selectAll('p.company');
+        ps.each(function() {
+            var name = d3.select(this).text();
+            if (name != c) {
+                d3.select(this).style('color', deselected_color);
+                d3.selectAll('g#' + name).attr('fill', deselected_color);
+                d3.selectAll('path#' + name)
+                    .attr('stroke', deselected_color);
+            }
+        });
+        selected_company = c;
+    }
+    
+    function clear_selected_company() {
+        var ps = d3.selectAll('p.company');
+        ps.each(function() {
+            var name = d3.select(this).text();
+            d3.select(this).style('color', model.get_color(name));
+            d3.selectAll('g#' + name).attr('fill', model.get_color(name));
+            d3.selectAll('path#' + name)
+                .attr('stroke', model.get_color(name))
+                .moveToFront();
+        });
+        selected_company = null;
+    }
+    
     function click_company_name(c) {
         if (model.get_company_list().length == 1) return;
         var ps = d3.selectAll('p.company');
         
-        if (selected_company == null) {
-            ps.each(function() {
-                var name = d3.select(this).text();
-                if (name != c) {
-                    d3.select(this).style('color', deselected_color);
-                    d3.selectAll('g#' + name).attr('fill', deselected_color);
-                    d3.selectAll('path#' + name)
-                        .attr('stroke', deselected_color);
-                }
-            });
-            selected_company = c;
-        } else if (selected_company == c) {
-            ps.each(function() {
-                var name = d3.select(this).text();
-                d3.select(this).style('color', model.get_color(name));
-                d3.selectAll('g#' + name).attr('fill', model.get_color(name));
-                d3.selectAll('path#' + name)
-                    .attr('stroke', model.get_color(name))
-                    .moveToFront();
-            });
-            selected_company = null;
-        } else {
-            ps.each(function() {
-                var name = d3.select(this).text();
-                if (name == c) {
-                    d3.select(this).style('color', model.get_color(name));
-                    d3.selectAll('g#' + name).attr('fill', model.get_color(name));
-                    d3.selectAll('path#' + name).attr('stroke', model.get_color(name))
-                        .moveToFront();
-                } else {
-                    d3.select(this).style('color', deselected_color);
-                    d3.selectAll('g#' + name).attr('fill', deselected_color);
-                    d3.selectAll('path#' + name).attr('stroke', deselected_color);
-                }
-            });
-            selected_company = c;
+        if (selected_company == null)
+            set_selected_company(c);
+        else if (selected_company == c)
+            clear_selected_company();
+        else {
+            clear_selected_company();
+            set_selected_company(c);
         }
     }
 }

@@ -221,6 +221,16 @@ div#comp_attributes_wrapper {
     display: block;
 }
 
+p.company {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+}
+
 
 /*h2 span, div.slide {
     -moz-transition: background-color 0.3s;
