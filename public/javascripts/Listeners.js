@@ -1,4 +1,5 @@
 var timeout;
+var being_sorted = false;
 
 $('#accordion_cont').liteAccordion({
     containerWidth: $(window).width() - 23,
@@ -13,6 +14,7 @@ $('div#visualizations ul').sortable({
         $('i#trash').removeClass('hidden');
     },
     'sort': function(e) {
+        being_sorted = true;
         var trash = $('i#trash').offset();
         trash.width = $('i#trash').width();
         trash.height = $('i#trash').height();
@@ -30,6 +32,7 @@ $('div#visualizations ul').sortable({
         }
     },
     'stop': function(e, ui) {
+        being_sorted = false;
         var trash = $('i#trash').offset();
         trash.width = $('i#trash').width();
         trash.height = $('i#trash').height();

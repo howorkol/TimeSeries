@@ -10,7 +10,7 @@ var selected_company = null;
 var deselected_color = 'rgba(222, 222, 222, 0.61)';
 
 function add_company(company_info, callback) {
-    if (model.get_company_list().indexOf(company_info.ticker) > -1) {
+    if (model.company_present(company_info.ticker)) {
         callback('err');
         return;
     }
@@ -121,7 +121,7 @@ function add_company(company_info, callback) {
     }
     
     function click_company_name(c) {
-        if (model.get_company_list().length == 1) return;
+        if (model.get_num_companies() == 1) return;
         var ps = d3.selectAll('p.company');
         
         if (selected_company == null)

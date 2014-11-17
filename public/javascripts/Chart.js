@@ -17,8 +17,8 @@ Chart.prototype.height;
 Chart.prototype.transition_dur = 500;
 
 Chart.prototype.set_hover_values = function(x0) {
-     for (var i = 0; i < model.get_company_list().length; i++) {
-        var curr_company = model.get_company_name(i);
+     for (var i = 0; i < model.get_num_companies(); i++) {
+        var curr_company = model.get_company_by_index(i);
         this.svg.select('g#' + curr_company + ' .yValue')
             .text(model.getYatX(this.attribute, curr_company, x0));
     }
@@ -49,7 +49,7 @@ Chart.prototype.make_chart = function() {
             var y_coor = d3.mouse(this)[1] - margin.top - 27;
             var x0 = x.invert(x_coor);
             
-            if ((x_coor < 0) || (y_coor < 0)) {
+            if ((x_coor < 0) || (y_coor < 0) || (being_sorted)) {
                 cursor_out();
                 return null;
             }
@@ -189,7 +189,7 @@ Chart.prototype.update_chart = function() {
     companies.selectAll('.yValue_group')
         .transition().duration(500)
         .attr('transform', function(d) {
-            return 'translate(' + (model.get_company_list().indexOf(d.company) 
+            return 'translate(' + (model.company_index(d.company) 
                                    * chart_width / 10) + ',10)';
         });
     
