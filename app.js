@@ -4,7 +4,24 @@ var express     = require('express'),
     http        = require('http'),
     favicon     = require('serve-favicon'),
     logger      = require('morgan'),
-    serveStatic = require('serve-static');
+    serveStatic = require('serve-static'),
+    mysql       = require('mysql');
+
+var db = mysql.createConnection({
+    host: 'localhost',
+    user: 'username',
+    password: 'userpass',
+    database: 'timeseries'
+});
+db.connect();
+/*
+var q = "select * from companies";
+db.query(q, function(err, rows, fields) {
+    if (err) console.log('err');
+    console.log(rows[0].tickersymbol);
+});
+
+db.end();*/
 
 var app = express();
 
