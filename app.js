@@ -1,6 +1,7 @@
 var _port = 3000;
 
 var express     = require('express'),
+    parse       = require('url').parse,
     http        = require('http'),
     favicon     = require('serve-favicon'),
     logger      = require('morgan'),
@@ -14,14 +15,6 @@ var db = mysql.createConnection({
     database: 'timeseries'
 });
 db.connect();
-/*
-var q = "select * from companies";
-db.query(q, function(err, rows, fields) {
-    if (err) console.log('err');
-    console.log(rows[0].tickersymbol);
-});
-
-db.end();*/
 
 var app = express();
 
@@ -32,7 +25,29 @@ app.use('/stylesheets', serveStatic(__dirname + '/public/stylesheets'));
 app.use('/javascripts', serveStatic(__dirname + '/public/javascripts'));
 
 app.get('/', serveStatic(__dirname + '/'));
+app.get('/query/*', function(req, res) {
+    var company = parse(req.url).pathname.substring(7);
+    var query = 'select year, dividendvalue, percentchange from ' +
+                'companyinfo where tickersymbol="' + company + '"';
+    
+    db.query(query, function(err, rows) {
+        if (err)
+            return res.status(500).send('Server Error');
+        
+        if (rows.length === 0)
+            return res.status(204).end();
+        else
+            return res.json(rows);
+    });
+});
 
-http.createServer(app).listen(app.get('port'), function() {
-    console.log("Express server listening on port " + app.get('port'));
+var server = http.createServer(app).listen(app.get('port'), function() {
+    console.log('Express server listening on port ' + app.get('port'));
+});
+
+process.on('SIGINT', function() {
+    console.log('Express server caught SIGINT, exiting nicely.');
+    server.close();
+    db.end();
+    process.exit();
 });
