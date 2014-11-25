@@ -7,7 +7,7 @@ $('#accordion_cont').liteAccordion({
     slideSpeed: 1000,
     theme : 'light'
 });
-
+/*
 $('div#visualizations ul').sortable({
     'disabled': true,
     'start': function(e, ui) {
@@ -60,7 +60,7 @@ $('div#visualizations ul').sortable({
         
         update_slider($('ul li:first-child').attr('id'));
     }
-});
+});*/
 
 $('form').submit(function() {
     $(this).children().last().click();
@@ -68,15 +68,16 @@ $('form').submit(function() {
 });
 
 $('form#searchBox > input.button').click(function () {
-    var company = {
+    /*var company = {
         'ticker': $('form#searchBox .select option:selected').attr('ticker'),
         'name': $('form#searchBox .select option:selected').attr('name')
-    }
+    }*/
+    var company = $('form#searchBox input.text').val();
     
     model = new Model();
     $('div#visualizations ul li').remove();
     $('p.company').remove();
-    $('div#visualizations ul').sortable('option', 'disabled', true);
+    //$('div#visualizations ul').sortable('option', 'disabled', true);
     selected_company = null;
     
     add_company(company, function(err) {
@@ -116,8 +117,17 @@ $('input#add').click(function() {
 });
 
 $('div.secondary_div input.button').click(function() {
-    var search_term = $('div.secondary_div input.text').val();
+    var company = $('div.secondary_div input.text').val();
     
+    add_company(company, function(err) {
+        if (err) {
+            console.log('No data for ' + company.name);
+            return false;
+        }
+        
+        $('div.secondary_div input.text').val('');
+    });
+    /*
     get_tickers(search_term, function(err, company_info) {
         if (err) {
             console.log('No results found.');
@@ -130,9 +140,9 @@ $('div.secondary_div input.button').click(function() {
             }
             $('div.secondary_div input.text').val('');
         });
-    });
+    });*/
 });
-
+/*
 var YAHOO = {'Finance': {'SymbolSuggest': {}}};
 var get_tickers = function(query, callback) {
     YAHOO.Finance.SymbolSuggest.ssCallback = function(data) {
@@ -150,7 +160,8 @@ var get_tickers = function(query, callback) {
         jsonpCallback: 'YAHOO.Finance.SymbolSuggest.ssCallback'
     });
 }
-
+*/
+/*
 $('form#searchBox .text').on('input propertychange paste', function() {
     var search_term = $(this).val();
     if (search_term === '') { 
@@ -175,8 +186,8 @@ $('form#searchBox .text').on('input propertychange paste', function() {
             $('form#searchBox .text').val(companies[0].ticker + ' - ' + companies[0].name);
         })
     }, 1000);
-});
-
+});*/
+/*
 $('form#searchBox .select').change(function() {
     var val = $('form#searchBox .select option:selected').text();
     $('form#searchBox .text').val(val);
@@ -184,4 +195,4 @@ $('form#searchBox .select').change(function() {
 
 $('p.company').click(function() {
     console.log('hi');
-});
+});*/

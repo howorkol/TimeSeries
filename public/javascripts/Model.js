@@ -18,6 +18,11 @@ var Model = function() {
     $('div#slider svg').remove();
     
     this.data = {};
+    
+    this.add_attribute('dividendvalue');
+    this.add_attribute('percentchange');
+    //this.add_chart('dividendvalue');
+    //this.add_chart('percentchange');
 }
 
 /*
@@ -94,8 +99,10 @@ Model.prototype.add_attribute = function(attribute_name, new_data) {
         }
     }
     
-    this.update_chart_heights();
-    this.update_charts();
+    this.add_chart(attribute_name);
+    
+    //this.update_chart_heights();
+    //this.update_charts();
 }
 
 /*
@@ -119,19 +126,29 @@ Model.prototype.delete_attribute = function(attribute_name) {
     Add a company to the data set and assign it a color.
     All charts are updated to reflect the new company.
 */
-Model.prototype.add_company = function(company_name, new_data) {
+Model.prototype.add_company = function(company_name, new_data, average) {
     // Add the new company to the company_list and assign it a color.
     this.company_list.push(company_name);
-    this.used_colors[company_name] = this.unused_color_list.shift();
     
-    for (var i = 0; i < this.attribute_list.length; i++) {
-        this.data[this.attribute_list[i]][this.company_list.length - 1] = {
-            'company': company_name,
-            'color'  : this.get_color(company_name),
-            'values' : new_data.map(function(d) {
-                return { 'date': parseDate(d[0]), 'value': +d[i + 1] || d[i + 1] };
-            })
-        }
+    if (!average)
+        this.used_colors[company_name] = this.unused_color_list.shift();
+    else
+        this.used_colors[company_name] = '#c9c9c9';
+    
+    this.data[this.attribute_list[0]][this.company_list.length - 1] = {
+        'company': company_name,
+        'color'  : this.get_color(company_name),
+        'values' : new_data.map(function(d) {
+            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['dividendvalue'] };
+        })
+    }
+    
+    this.data[this.attribute_list[1]][this.company_list.length - 1] = {
+        'company': company_name,
+        'color'  : this.get_color(company_name),
+        'values' : new_data.map(function(d) {
+            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['percentchange'] };
+        })
     }
     
     this.update_charts();
@@ -265,7 +282,7 @@ Model.prototype.getYatX = function(attribute, company, date) {
         if (this.data[attribute][i].company === company)
             data = this.data[attribute][i].values;
     }
-    
+    console.log(data);
     for (var i = 0; i < data.length; i++) {
         if (date >= data[i]['date']) {
             return (Math.abs(date - data[i]['date']) <= 

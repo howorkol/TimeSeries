@@ -1,85 +1,56 @@
-var init_attribute = '1';
-var disable_slides = true;
 var chart_height;
-var query_part = 'https://quandl.com/api/v1/multisets.json?collapse=monthly&columns=';
-var auth_token = '&auth_token=WczNwgPepRcbZR9Yf7qt';
+
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 var total = 0;
-var model = new Model();
 var selected_company = null;
 var deselected_color = 'rgba(222, 222, 222, 0.61)';
 
-function add_company(company_info, callback) {
-    if (model.company_present(company_info.ticker)) {
+function add_company(company, callback) {
+    if (model.company_present(company)) {
         callback('err');
         return;
     }
     
-    var p = d3.select('div#visulaization_slide div.secondary_div').append('p')
-        .attr('class', 'company');
-    
-    if (model.get_num_attributes() == 0) {
-        // This is the first company being added.
-        total = 1;
-        
-        var query = query_part;
-        query += 'WIKI.' + company_info.ticker + '.' + init_attribute + auth_token;
-        
-        d3.json(query, function(err, data) {
-        
+    if (model.get_num_companies() == 0) {
+        d3.json('/industry/' + company, function(err, data) {
             if (err) {
                 callback(err);
-                p.remove();
                 return;
             }
             
-            model.add_attribute(init_attribute);
-            model.add_company(company_info.ticker, data.data);
-            create_slider();
-            model.add_chart(init_attribute);
-            
-            p.attr('title', company_info.name)
-                .style('color', model.get_color(company_info.ticker))
-                .text(company_info.ticker)
-                .on('click', function() {
-                    click_company_name(company_info.ticker);
-                });
-                
-            total++;
-            
+            model.add_company('average', data, true);
             callback(null);
         });
-    } else {
-        // This is not the first company being added.
-        var query = query_part;
-        for (a in model.attribute_list) {
-            query += 'WIKI.' + company_info.ticker + '.' + model.attribute_list[a] + ',';
+    }
+    else {
+    d3.json('/query/' + company, function(err, data) {
+        if (err) {
+            callback(err);
+            return;
         }
-        query = query.substring(0, query.length - 1);
-        query += auth_token;
         
-        d3.json(query, function(err, data) {
-            if (err) {
-                callback(err);
-                p.remove();
-                return;
-            }
-            
-            model.add_company(company_info.ticker, data.data);
-            update_slider();
-            
-            p.attr('title', company_info.name)
-                .style('color', function() {
-                    if (selected_company == null)
-                        return model.get_color(company_info.ticker);
-                    else return deselected_color;
-                })
-                .text(company_info.ticker)
-                .on('click', function() {
-                    click_company_name(company_info.ticker);
-                })
-              .append('i')
-                .attr('id', company_info.ticker)
+        var p = d3.select('div#visulaization_slide div.secondary_div').append('p')
+            .attr('class', 'company');
+        
+        // Add the data to the model.
+        model.add_company(company, data);
+        
+        // Add the company title to the legend.
+        p.attr('title', company)
+            .style('color', function() {
+                if (selected_company == null)
+                    return model.get_color(company);
+                else return deselected_color;
+            })
+            .text(company)
+            .on('click', function() {
+                click_company_name(company);
+            });
+        
+        if (model.get_num_companies() > 1) {
+            // If it's not the first company include an 'X'
+            p.append('i')
+                .attr('id', company)
                 .attr('class', 'fa fa-times')
                 .on('click', function() {
                     var comp = $(this).attr('id');
@@ -88,9 +59,11 @@ function add_company(company_info, callback) {
                         $('p.company i#' + comp).parent().remove();
                     });
                 });
-            
-            callback(null);
-        });
+        }
+        
+        callback(null);
+    });
+    
     }
     
     function set_selected_company(c) {
@@ -137,38 +110,6 @@ function add_company(company_info, callback) {
 
 function delete_company(company_name, callback) {
     model.delete_company(company_name);
-    update_slider();
-    callback();
-}
-
-function add_attribute(attribute_name, callback) {
-    // User adds a new attribute.
-    var query = query_part;
-    for (c in model.company_list) {
-        query += 'WIKI.' + model.company_list[c] + '.' + attribute_name + ',';
-    }
-    query = query.substring(0, query.length - 1);
-    query += auth_token;
-    
-    d3.json(query, function(err, data) {
-        if (err) {
-            callback(err);
-            return;
-        }
-        
-        model.add_attribute(attribute_name, data.data);
-        model.add_chart(attribute_name);
-        $('div#visualizations ul').sortable('option', 'disabled', false);
-        
-        total++;
-        callback(null);
-    });
-}
-
-function delete_attribute(li_element, attribute_name, callback) {
-    // Remove html node from page.
-    li_element.remove();
-    model.delete_attribute(attribute_name);
     callback();
 }
 

@@ -3,9 +3,7 @@ var margin = {top: 3, right: 0, bottom: 15, left: 65, s_bottom: 20};
 
 var Chart = function(attribute) {
     this.attribute = attribute;
-    this.svg = d3.select(chart_container).append('li')
-        .attr('id', this.attribute).append('svg');
-    this.plotted_companies = [];
+    this.svg = d3.select(chart_container).append('svg');
     this.set_height();
     this.make_chart();
 };
@@ -43,8 +41,9 @@ Chart.prototype.make_chart = function() {
     
     // Create the svg element to hold everything.
     this.svg.attr('width',  $(chart_container).width())
-        .attr('height', this.height)
-        .on('mousemove', function() {
+        .attr('height', this.height);
+    
+        /*.on('mousemove', function() {
             var x_coor = d3.mouse(this)[0] - margin.left - 1;
             var y_coor = d3.mouse(this)[1] - margin.top - 27;
             var x0 = x.invert(x_coor);
@@ -61,7 +60,7 @@ Chart.prototype.make_chart = function() {
 
             model.chart_hover(x0);
         
-        }).on('mouseleave', cursor_out);
+        }).on('mouseleave', cursor_out);*/
     
     // The clip path area is where is chart is allowed to show through.
     // When the user selects an area with the slider, the line widths are
@@ -79,12 +78,11 @@ Chart.prototype.make_chart = function() {
         .attr('id', this.attribute)
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    var x = this.x.domain(model.date_range()).range([1, chart_width]);
+    var x = this.x.range([1, chart_width]);
     
     // Grab and set the y domain and range. The domain depends on the 
     // data for this attribute, range depends on chart height.
     var y = this.y = d3.scale.linear()
-        .domain(model.value_range(this.attribute))
         .range([chart_height, 25]).nice();
     
     this.line = d3.svg.line()
@@ -132,7 +130,7 @@ Chart.prototype.make_chart = function() {
         .attr('transform', 'translate(' + (chart_width + margin.left - 6) + ', 20)')
         .attr('text-anchor', 'end');
     
-    this.update_chart();
+    //this.update_chart();
 }
 
 Chart.prototype.update_chart = function() {
@@ -141,9 +139,10 @@ Chart.prototype.update_chart = function() {
     var line = this.line;
 
     // Set the chart domain and range as it may have changed. 
-    this.x.domain(brush.empty() 
+    /*this.x.domain(brush.empty() 
             ? model.date_range() 
-            : brush.extent());
+            : brush.extent());*/
+    this.x.domain(model.date_range());
     this.y.domain(model.value_range(this.attribute))
         .range([chart_height, 25]).nice();
     
@@ -252,7 +251,7 @@ Chart.prototype.update_chart_height = function() {
 */
 Chart.prototype.set_height = function() {
     var total_height = $('div#visualizations div#charts').height();
-    Chart.prototype.height = ((total_height / model.get_num_attributes()) > this.min_chart_height)
-            ? (total_height / model.get_num_attributes()) - 7
+    Chart.prototype.height = ((total_height / 2/*model.get_num_attributes()*/) > this.min_chart_height)
+            ? (total_height / 2/*model.get_num_attributes()*/) - 7
             : this.min_chart_height;
 };
