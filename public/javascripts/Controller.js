@@ -5,24 +5,27 @@ var total = 0;
 var selected_company = null;
 var deselected_color = 'rgba(222, 222, 222, 0.61)';
 
+function add_industry(industry, callback) {
+    d3.json('/industry/' + industry, function(err, data) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        
+        model.add_company('average', data.average, data.companies);
+        
+        callback(null);
+    });
+}
+
 function add_company(company, callback) {
+    company = company.toUpperCase();
+    
     if (model.company_present(company)) {
         callback('err');
         return;
     }
     
-    if (model.get_num_companies() == 0) {
-        d3.json('/industry/' + company, function(err, data) {
-            if (err) {
-                callback(err);
-                return;
-            }
-            
-            model.add_company('average', data, true);
-            callback(null);
-        });
-    }
-    else {
     d3.json('/query/' + company, function(err, data) {
         if (err) {
             callback(err);
@@ -63,8 +66,6 @@ function add_company(company, callback) {
         
         callback(null);
     });
-    
-    }
     
     function set_selected_company(c) {
         var ps = d3.selectAll('p.company');

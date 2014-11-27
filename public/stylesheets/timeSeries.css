@@ -108,6 +108,11 @@ div.slide_container div.main_div, div.slide_container div.secondary_div {
 }
 
 div#visualizations div#charts {
+    /*overflow-y: scroll;
+    height: calc(100% - 70px);*/
+}
+
+div.scroll_div {
     overflow-y: scroll;
     height: calc(100% - 70px);
 }

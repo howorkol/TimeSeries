@@ -7,6 +7,10 @@ $('#accordion_cont').liteAccordion({
     slideSpeed: 1000,
     theme : 'light'
 });
+
+$("#industry_table").tablesorter(
+
+);
 /*
 $('div#visualizations ul').sortable({
     'disabled': true,
@@ -72,22 +76,23 @@ $('form#searchBox > input.button').click(function () {
         'ticker': $('form#searchBox .select option:selected').attr('ticker'),
         'name': $('form#searchBox .select option:selected').attr('name')
     }*/
-    var company = $('form#searchBox input.text').val();
+    var industry = $('form#searchBox input.text').val();
     
-    model = new Model();
-    $('div#visualizations ul li').remove();
+    $('div#visualizations ul svg').remove();
     $('p.company').remove();
+    $('#industry_table tbody tr').remove();
+    model = new Model();
     //$('div#visualizations ul').sortable('option', 'disabled', true);
     selected_company = null;
     
-    add_company(company, function(err) {
+    add_industry(industry, function(err) {
         if (err) {
-            console.log('No data for ' + company.name);
+            console.log('No data for ' + industry);
             return false;
         }
         
         disable_slides = false;
-        $('.company_name').text(company.name);
+        $('.company_name').text(industry);
         $('ol li:nth-child(2) span').click();
         $('form#searchBox > input.text').val('');
         $('form#searchBox select option').remove();

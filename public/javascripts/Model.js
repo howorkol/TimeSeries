@@ -12,12 +12,12 @@ var Model = function() {
     this.attribute_list = [];
     this.charts = {};
     this.unused_color_list = [
-        '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2'
+        '#c9c9c9', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2'
     ];
     this.used_colors = {};
     $('div#slider svg').remove();
     
-    this.data = {};
+    this.data = { attributes: {} };
     
     this.add_attribute('dividendvalue');
     this.add_attribute('percentchange');
@@ -126,14 +126,14 @@ Model.prototype.delete_attribute = function(attribute_name) {
     Add a company to the data set and assign it a color.
     All charts are updated to reflect the new company.
 */
-Model.prototype.add_company = function(company_name, new_data, average) {
+Model.prototype.add_company = function(company_name, new_data, all_companies) {
     // Add the new company to the company_list and assign it a color.
     this.company_list.push(company_name);
     
-    if (!average)
+    //if (!average)
         this.used_colors[company_name] = this.unused_color_list.shift();
-    else
-        this.used_colors[company_name] = '#c9c9c9';
+   // else
+        //this.used_colors[company_name] = '#c9c9c9';
     
     this.data[this.attribute_list[0]][this.company_list.length - 1] = {
         'company': company_name,
@@ -151,7 +151,22 @@ Model.prototype.add_company = function(company_name, new_data, average) {
         })
     }
     
+    if (all_companies) {
+        this.all_companies = all_companies;
+        this.update_table();
+    }
+    
     this.update_charts();
+}
+
+Model.prototype.update_table = function() {
+    for (var i = 0; i < this.all_companies.length; i++) {
+        var data = this.all_companies[i];
+        var html = '<tr><td>' + data.companyname + '</td><td>' + data.tickersymbol + 
+                '</td><td>' + data.industry + '</td><td>' + data.noyears + '</td></tr>';
+        $('#industry_table tbody').append(html);
+        $('#industry_table').trigger('update');
+    }
 }
 
 /*
