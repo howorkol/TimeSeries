@@ -1,5 +1,6 @@
 var timeout;
 var being_sorted = false;
+var disable_slides = true;
 
 $('#accordion_cont').liteAccordion({
     containerWidth: $(window).width() - 23,
@@ -147,6 +148,9 @@ $('div.secondary_div input.button').click(function() {
         });
     });*/
 });
+
+
+
 /*
 var YAHOO = {'Finance': {'SymbolSuggest': {}}};
 var get_tickers = function(query, callback) {

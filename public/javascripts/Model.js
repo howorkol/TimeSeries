@@ -21,8 +21,7 @@ var Model = function() {
     
     this.add_attribute('dividendvalue');
     this.add_attribute('percentchange');
-    //this.add_chart('dividendvalue');
-    //this.add_chart('percentchange');
+    
 }
 
 /*
@@ -100,9 +99,6 @@ Model.prototype.add_attribute = function(attribute_name, new_data) {
     }
     
     this.add_chart(attribute_name);
-    
-    //this.update_chart_heights();
-    //this.update_charts();
 }
 
 /*
@@ -129,11 +125,7 @@ Model.prototype.delete_attribute = function(attribute_name) {
 Model.prototype.add_company = function(company_name, new_data, all_companies) {
     // Add the new company to the company_list and assign it a color.
     this.company_list.push(company_name);
-    
-    //if (!average)
-        this.used_colors[company_name] = this.unused_color_list.shift();
-   // else
-        //this.used_colors[company_name] = '#c9c9c9';
+    this.used_colors[company_name] = this.unused_color_list.shift();
     
     this.data[this.attribute_list[0]][this.company_list.length - 1] = {
         'company': company_name,
@@ -153,20 +145,10 @@ Model.prototype.add_company = function(company_name, new_data, all_companies) {
     
     if (all_companies) {
         this.all_companies = all_companies;
-        this.update_table();
+        update_table(this.all_companies);
     }
     
     this.update_charts();
-}
-
-Model.prototype.update_table = function() {
-    for (var i = 0; i < this.all_companies.length; i++) {
-        var data = this.all_companies[i];
-        var html = '<tr><td>' + data.companyname + '</td><td>' + data.tickersymbol + 
-                '</td><td>' + data.industry + '</td><td>' + data.noyears + '</td></tr>';
-        $('#industry_table tbody').append(html);
-        $('#industry_table').trigger('update');
-    }
 }
 
 /*
