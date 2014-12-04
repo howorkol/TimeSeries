@@ -26,6 +26,10 @@ div.slide_container {
     background-color: #ededed;
 }
 
+div.slide_container > div {
+    margin: 5px;
+}
+
 h2.selected + div > div.slide_container {
     background-color: #ffffff;
 }
@@ -33,6 +37,7 @@ h2.selected + div > div.slide_container {
 /* -------------------- 
    END ACCORDION
    -------------------- */
+
 
 /* -------------------- 
    FORM
@@ -88,200 +93,43 @@ form#searchBox span#browse:active {
    END FORM
    -------------------- */
 
-/* -------------------- 
-   MAIN DIV
-   -------------------- */
 
 /* -------------------- 
-   END MAIN DIV
+   MAIN/SECONDARY DIV
    -------------------- */
 
-/*
-div.secondary_div input {
-    font-size: 1.1em;
-    padding: 2px;
+div.main_div {
+    width: calc(100% - 6px);
 }
 
-div.secondary_div input.text {
-    width: calc(80% - 5px);
-}
-
-div.secondary_div input.button {
-    width: calc(20% - 4px);
-    margin-left: -4px;
-}*/
-
-/*input.text, div#compare_cont > div {
-    background-color: #ddd;
-}
-
-input.button, div#compare_cont > div:hover {
-    background-color: #aaa;
-}
-
-input.button:hover, div#compare_cont > div.selected {
-    background-color: #777;
-}*/
-/*
-input.button:active {
-    background-color: #444;
-}*/
-
-div.slide_container > div {
-    margin: 5px;
-}
-
-div.slide_container div.page_top {
-    height: 65px;
-}
-
-div.main_div, div.secondary_div, div#compare_cont > div {
-    display: inline-block;
-}
-
-div.slide_container div.main_div, div.slide_container div.secondary_div {
-    height: calc(100% - 80px);
-    margin-top: 0;
-}
-
-div#visualizations div#charts {
-    /*overflow-y: scroll;
-    height: calc(100% - 70px);*/
-}
-
-div.scroll_div {
-    overflow-y: scroll;
-    /*height: calc(100% - 70px);*/
-    height: 100%;
-}
-
-div#visualizations div#slider {
-    height: 70px;
-}
-
-div.slide_container div.main_div {
-    width: calc(100% - 196px);
+div.main_div.split {
+    width: calc(100% - 200px);
     float: left;
-    /*overflow-y: scroll;*/
 }
 
-div.slide_container div.secondary_div {
+div.secondary_div {
     margin-left: 0;
     width: 180px;
     position: relative;
 }
 
-div.slide_container div.page_top h1 {
-    /*font-size: 3.2em;
-    
-    line-height: 75px;
-    padding-left: 15px;*/
-}
-/*
-div#compare_cont {
-    float: right;
-    width: 180px;
-    height: 75px;
+div.main_div, div.secondary_div {
+    height: calc(100% - 80px);
+    margin-top: 0;
+    display: inline-block;
 }
 
-div#compare_cont > p {
-    font-size: 1.5em;
+div.main_div > div.scroll_div {
+    overflow-y: scroll;
+    height: 100%;
 }
 
-div#compare_cont > p, div#compare_cont > div {
-    height: 50%;
-    line-height: 37.5px;
+div.page_top {
+    height: 65px;
 }
 
-div#compare_cont > div {
-    width: 50%;
-    font-size: 1em;
-    text-align: center;
-    cursor: default;
-}
-
-div#compare_cont #comp_attr {
-    float: left;
-}*/
-/*
-input#add {
-    float:right;
-}
-*/
-/*
-svg {
-    width: 100%;
-}
-
-svg rect {
-    stroke-width: 1px;
-    stroke: white;
-}
-
-li.ui-sortable-helper svg rect {
-    fill-opacity: 0.5;
-}
-
-div#charts ul li:hover {
-    /*cursor: move;
-}
-
-i#trash {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-}
-
-i#trash.hidden {
-    display: none;
-}*/
-
-p.company {
-    font-size: 30px;
-    padding: 5px;
-}
-/*
-p.company i.fa-times {
-    position: absolute;
-    right: 0;
-    color: rgba(0, 0, 0, 0.48);
-}
-
-p.company i.fa-times:hover {
-    color: rgba(0, 0, 0, 0.24);
-}*/
-
-#info_slide table.comp_table {
-    width: calc(100% - 244px);
-    height: calc(100% - 91px);
-    display: none;
-}
-
-div#comp_attributes_wrapper {
-    height: calc(100% - 91px);
-    
-}
-
-#info_slide table.comp_table.selected {
-    display: block;
-}
-
-p.company {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    cursor: pointer;
-}
+/* -------------------- 
+   END MAIN/SECONDARY DIV
+   -------------------- */
 
 .ui-autocomplete { max-height: 200px; overflow-y: scroll; overflow-x: hidden;}
-
-
-/*h2 span, div.slide {
-    -moz-transition: background-color 0.3s;
-    -o-transition: background-color 0.3s;
-    -webkit-transition: background-color 0.3s;
-    transition: background-color 0.3s;
-}*/

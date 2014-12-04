@@ -96,8 +96,8 @@ $('form#searchBox > input.button').click(function () {
     var industry = $('form#searchBox input.text').val();
     
     $('div#visualizations ul svg').remove();
-    $('p.company').remove();
-    $('#industry_table tbody tr').remove();
+    $('h3.company_label').remove();
+    $('#company_table tbody tr').remove();
     model = new Model();
     //$('div#visualizations ul').sortable('option', 'disabled', true);
     selected_company = null;

@@ -153,26 +153,22 @@ Chart.prototype.update_chart = function() {
     // Enter the data. Applies to newly added lines.
     var enter = companies.enter()
         .append('g').attr('class', 'company');
+    
     enter.append('path').attr('class', 'line')
         .attr('id', function(d) { return d.company; })
         .attr('d', function(d) { return line(d.values); })
         .attr('stroke', function(d) { 
-            if ((selected_company == null) || (selected_company == d.company))
-                return d.color;
-            else return deselected_color;
+            return d.color;
         })
         .attr('stroke-opacity', 0);
+    
     var yValue_group = enter.append('g').attr('class', 'yValue_group')
         .attr('id', function(d) { return d.company; })
         .attr('fill', function(d) { 
-            if ((selected_company == null) || (selected_company == d.company))
-                return d.color;
-            else return deselected_color;
+            return d.color;
         })
-        .attr('font-size', '.9em')
-        .attr('transform', function(d, i) {
-            return 'translate(' + (i * chart_width / 10) + ',10)';
-        });
+        .attr('font-size', '.9em');
+    
     yValue_group.append('text')
         .text(function(d) { return d.company; });
     yValue_group.append('text')
@@ -188,8 +184,15 @@ Chart.prototype.update_chart = function() {
     companies.selectAll('.yValue_group')
         .transition().duration(500)
         .attr('transform', function(d) {
-            return 'translate(' + (model.company_index(d.company) 
-                                   * chart_width / 10) + ',10)';
+            var i = model.company_index(d.company);
+            if (i == 0) {
+                return 'translate(' + (chart_width - 10) + ',10)';
+            } else {
+                return 'translate(' + ((i - 1) * chart_width / 10) + ',10)';
+            }
+        }).attr('text-anchor', function(d) {
+            if (model.company_index(d.company) == 0)
+                return 'end';
         });
     
     // Remove lines that no longer have data.
