@@ -42,8 +42,21 @@ app.get('/query/*', function(req, res) {
     });
 });
 
+app.get('/industries', function(req, res) {
+    var industry = parse(req.url).pathname.substring(12);
+    
+    var query = 'select industry, count(*) as count from companies group by industry ' +
+        'order by industry asc';
+    db.query(query, function(err, rows) {
+        if (err) return res.status(500).send('Server Error');
+        if (rows.length === 0) return res.status(204).end();
+        return res.json(rows);
+    });
+});
+
 app.get('/industry/*', function(req, res) {
-    var industry = parse(req.url).pathname.substring(10);
+    var industry = parse(req.url).pathname.substring(10).replace(/%20/g, ' ');
+    
     var data = {};
     var error;
     var no_data = false;
@@ -52,8 +65,8 @@ app.get('/industry/*', function(req, res) {
     var query1 = 'select year, avg(dividendvalue) as dividendvalue, ' +
                 'avg(percentchange) as percentchange from ' +
                 'companyinfo join companies where companyinfo.tickersymbol ' +
-                '= companies.tickersymbol and companies.industry like "%' +
-                industry + '%" group by year';
+                '= companies.tickersymbol and companies.industry = "' +
+                industry + '" group by year';
     db.query(query1, function(err, rows) {
         if (err) return res.status(500).send('Server Error');
         if (rows.length === 0) return res.status(204).end();

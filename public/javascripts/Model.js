@@ -145,7 +145,7 @@ Model.prototype.add_company = function(company_name, new_data, all_companies) {
     
     if (all_companies) {
         this.all_companies = all_companies;
-        update_table(this.all_companies);
+        update_company_table(this.all_companies);
     }
     
     this.update_charts();

@@ -1,6 +1,6 @@
 var timeout;
-var being_sorted = false;
-var disable_slides = true;
+//var being_sorted = false;
+//var disable_slides = true;
 
 $('#accordion_cont').liteAccordion({
     containerWidth: $(window).width() - 23,
@@ -9,9 +9,25 @@ $('#accordion_cont').liteAccordion({
     theme : 'light'
 });
 
-$("#industry_table").tablesorter(
+$(".tablesorter").tablesorter();
 
-);
+d3.json('/industries', function(err, data) {
+    var industry_list = [];
+        
+    if (err) {
+        callback(err);
+        return;
+    }
+
+    data.forEach(function(d) {
+        industry_list.push(d.industry);
+    });
+    
+    $('form#searchBox > input.text').autocomplete({
+        source: industry_list
+    });
+});
+
 /*
 $('div#visualizations ul').sortable({
     'disabled': true,
@@ -93,10 +109,10 @@ $('form#searchBox > input.button').click(function () {
         }
         
         disable_slides = false;
-        $('.company_name').text(industry);
+        $('h1.industry_name').text(industry);
         $('ol li:nth-child(2) span').click();
         $('form#searchBox > input.text').val('');
-        $('form#searchBox select option').remove();
+        //$('form#searchBox select option').remove();
         
     });
 });

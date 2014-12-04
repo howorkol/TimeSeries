@@ -2,7 +2,22 @@ body {
     margin: 0;
     font-family: sans-serif;
     color: rgba(0, 0, 0, 0.60);
+    overflow-y: hidden;
 }
+
+h1 {
+    font-size: 2.3em;
+    line-height: 1em;
+}
+
+h3 {
+    font-size: 1.8em;
+    line-height: 1em;
+}
+
+/* -------------------- 
+   ACCORDION
+   -------------------- */
 
 div.slide_container {
     width: 100%;
@@ -15,8 +30,16 @@ h2.selected + div > div.slide_container {
     background-color: #ffffff;
 }
 
+/* -------------------- 
+   END ACCORDION
+   -------------------- */
+
+/* -------------------- 
+   FORM
+   -------------------- */
+
 form#searchBox {
-    width: 400px;
+    width: 450px;
     position: fixed;
     top: 35%;
     left: 15%;
@@ -24,42 +47,56 @@ form#searchBox {
     background-color: transparent;
 }
 
-h1 {
-    font-size: 40px;
-}
-
-form#searchBox h1 {
-    line-height: 1em;
-    margin-bottom: 25px;
-}
-
-form#searchBox input, form#searchBox .select {
+form#searchBox input {
     font-size: 1.3em;
     padding: 8px 15px;
     height: 25px;
 }
 
-form#searchBox input {
-    position: absolute;
-    bottom: 0;
-}
-
 form#searchBox input.text {
     width: 260px;
+    margin-right: -4px;
+    background-color: #ddd;
 }
 
 form#searchBox input.button {
-    right: 0;
-    width: 60px;
+    background-color: #aaa;
 }
 
-form#searchBox .select {
-    width: 280px;
+form#searchBox input.button:hover {
+    background-color: #777;
 }
 
+form#searchBox input.button:active {
+    background-color: #444;
+}
+    
+form#searchBox span#browse {
+    color: rgba(0, 0, 0, 0.40);
+    cursor: pointer;
+}
 
-/**/
+form#searchBox span#browse:hover {
+    color: #777;
+}
 
+form#searchBox span#browse:active {
+    color: #444;
+}
+
+/* -------------------- 
+   END FORM
+   -------------------- */
+
+/* -------------------- 
+   MAIN DIV
+   -------------------- */
+
+/* -------------------- 
+   END MAIN DIV
+   -------------------- */
+
+/*
 div.secondary_div input {
     font-size: 1.1em;
     padding: 2px;
@@ -72,9 +109,9 @@ div.secondary_div input.text {
 div.secondary_div input.button {
     width: calc(20% - 4px);
     margin-left: -4px;
-}
+}*/
 
-input.text, div#compare_cont > div {
+/*input.text, div#compare_cont > div {
     background-color: #ddd;
 }
 
@@ -84,18 +121,18 @@ input.button, div#compare_cont > div:hover {
 
 input.button:hover, div#compare_cont > div.selected {
     background-color: #777;
-}
-
+}*/
+/*
 input.button:active {
     background-color: #444;
-}
+}*/
 
 div.slide_container > div {
     margin: 5px;
 }
 
 div.slide_container div.page_top {
-    height: 75px;
+    height: 65px;
 }
 
 div.main_div, div.secondary_div, div#compare_cont > div {
@@ -103,7 +140,7 @@ div.main_div, div.secondary_div, div#compare_cont > div {
 }
 
 div.slide_container div.main_div, div.slide_container div.secondary_div {
-    height: calc(100% - 91px);
+    height: calc(100% - 80px);
     margin-top: 0;
 }
 
@@ -114,7 +151,8 @@ div#visualizations div#charts {
 
 div.scroll_div {
     overflow-y: scroll;
-    height: calc(100% - 70px);
+    /*height: calc(100% - 70px);*/
+    height: 100%;
 }
 
 div#visualizations div#slider {
@@ -134,11 +172,12 @@ div.slide_container div.secondary_div {
 }
 
 div.slide_container div.page_top h1 {
-    font-size: 3.2em;
-    padding-left: 15px;
+    /*font-size: 3.2em;
+    
     line-height: 75px;
+    padding-left: 15px;*/
 }
-
+/*
 div#compare_cont {
     float: right;
     width: 180px;
@@ -163,12 +202,13 @@ div#compare_cont > div {
 
 div#compare_cont #comp_attr {
     float: left;
-}
-
+}*/
+/*
 input#add {
     float:right;
 }
-
+*/
+/*
 svg {
     width: 100%;
 }
@@ -183,7 +223,7 @@ li.ui-sortable-helper svg rect {
 }
 
 div#charts ul li:hover {
-    /*cursor: move;*/
+    /*cursor: move;
 }
 
 i#trash {
@@ -194,13 +234,13 @@ i#trash {
 
 i#trash.hidden {
     display: none;
-}
+}*/
 
 p.company {
     font-size: 30px;
     padding: 5px;
 }
-
+/*
 p.company i.fa-times {
     position: absolute;
     right: 0;
@@ -209,7 +249,7 @@ p.company i.fa-times {
 
 p.company i.fa-times:hover {
     color: rgba(0, 0, 0, 0.24);
-}
+}*/
 
 #info_slide table.comp_table {
     width: calc(100% - 244px);
@@ -235,6 +275,8 @@ p.company {
     user-select: none;
     cursor: pointer;
 }
+
+.ui-autocomplete { max-height: 200px; overflow-y: scroll; overflow-x: hidden;}
 
 
 /*h2 span, div.slide {

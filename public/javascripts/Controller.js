@@ -49,7 +49,7 @@ function add_company(company, callback) {
             .on('click', function() {
                 click_company_name(company);
             });
-        
+        /*
         if (model.get_num_companies() > 1) {
             // If it's not the first company include an 'X'
             p.append('i')
@@ -60,9 +60,9 @@ function add_company(company, callback) {
                     setTimeout(clear_selected_company, 100);
                     delete_company(comp, function() {});
                 });
-        }
+        }*/
         
-        $('#industry_table tbody tr#' + company)
+        $('#company_table tbody tr#' + company)
                 .children().css('background-color', model.get_color(company));
         
         callback(null);
@@ -113,7 +113,7 @@ function add_company(company, callback) {
 function delete_company(company_name, callback) {
     model.delete_company(company_name);
     $('p.company i#' + company_name).parent().remove();
-    $('#industry_table tbody tr#' + company_name)
+    $('#company_table tbody tr#' + company_name)
             .children().css('background-color', '');
     callback();
 }
@@ -126,17 +126,17 @@ d3.selection.prototype.moveToFront = function() {
     });
 };
 
-function update_table(all_companies) {
+function update_company_table(all_companies) {
     for (var i = 0; i < all_companies.length; i++) {
         var data = all_companies[i];
         var html = '<tr id="' + data.tickersymbol + '"><td>' + data.companyname + 
                 '</td><td>' + data.tickersymbol + '</td><td>' + data.industry + 
                 '</td><td>' + data.noyears + '</td></tr>';
-        $('#industry_table tbody').append(html);
-        $('#industry_table').trigger('update');
+        $('#company_table tbody').append(html);
+        $('#company_table').trigger('update');
     }
     
-    $('#industry_table tbody tr').click(function() {
+    $('#company_table tbody tr').click(function() {
         var row = $(this);
         var company = row.attr('id');
         

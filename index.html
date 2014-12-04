@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>TimeSeries</title>
     
+    
+    <link href="/stylesheets/liteAccordion.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+    <link href="/stylesheets/tablesorter.css" rel="stylesheet" type="text/css"/>
     <link href="/stylesheets/timeSeries.css" rel="stylesheet" type="text/css"/>
     <link href="/stylesheets/Chart.css" rel="stylesheet" type="text/css"/>
-    <link href="/stylesheets/liteAccordion.css" rel="stylesheet" type="text/css"/>
-    <link href="/stylesheets/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/stylesheets/tablesorter.css" rel="stylesheet" type="text/css"/>
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
     <div id='accordion_cont'>
@@ -19,36 +19,12 @@
         <div>
         <div class='slide_container' id='start_slide'>
             <form id='searchBox' autocomplete='off'>
-                <h1>Search for an industry to begin</h1>
+                <h1 class='title'>Search for an industry or 
+                    <span id='browse'>browse all</span>
+                </h1>
                 <input class='text' type="text" placeholder="Search...">
                 <input class='button' type="button" value="Search">
-                <select class='select'></select>
             </form>
-        </div>
-        </div>
-    </li>
-        
-    <li>
-        <h2><span class='slide_title'>Visulaizations</span></h2>
-        <div>
-        <div class='slide_container' id='visulaization_slide'>
-            <div class='page_top'>
-                <input id='add' type="button" value="Add Attribute">
-                <h1>
-                    <span class='company_name'>Company Name</span>
-                </h1>
-            </div>
-            <div class='main_div' id='visualizations'>
-                <div id='charts' class='scroll_div'><ul></ul></div>
-                <div id='slider'></div>
-            </div>
-            <div class='secondary_div' id='legend'>
-                <form autocomplete='off'>
-                    <input class='text' type="text" placeholder="Compare With...">
-                    <input class='button' type="button" value="Go">
-                </form>
-                <i id='trash' class='fa fa-trash fa-5x hidden'></i>
-            </div>
         </div>
         </div>
     </li>
@@ -58,17 +34,11 @@
         <div>
         <div class='slide_container' id='info_slide'>
             <div class='page_top'>
-                <!--<div id='compare_cont'>
-                    <p>Compare</p>
-                    <div class='selected' id='comp_attr'>Attributes</div>
-                    <div id='comp_comp'>Companies</div>
-                </div>-->
-                <h1>
-                    <span class='company_name'>Company Name</span>
-                </h1>
+                <h1 class='title industry_name'>Placeholder</h1>
+                <h3>Click on a company to add to charts.</h3>
             </div>
             <div class='main_div'><div class='scroll_div'>
-                <table id='industry_table' class='tablesorter'>
+                <table id='company_table' class='tablesorter'>
                     <thead><tr>
                         <th>Company</th>
                         <th>Symbol</th>
@@ -82,13 +52,36 @@
         </div>
         </div>
     </li>
+        
+    <li>
+        <h2><span class='slide_title'>Visulaizations</span></h2>
+        <div>
+        <div class='slide_container' id='visulaization_slide'>
+            <div class='page_top'>
+                <h1 class='title industry_name'>Placeholder</h1>
+                <h3>Placeholder</h3>
+            </div>
+            <div class='main_div' id='visualizations'>
+                <div id='charts' class='scroll_div'><ul></ul></div>
+                <div id='slider'></div>
+            </div>
+            <div class='secondary_div' id='legend'>
+                <!--<form autocomplete='off'>
+                    <input class='text' type="text" placeholder="Compare With...">
+                    <input class='button' type="button" value="Go">
+                </form>
+                <i id='trash' class='fa fa-trash fa-5x hidden'></i>-->
+            </div>
+        </div>
+        </div>
+    </li>
     </ol>
     </div>
     
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
     <script src="/javascripts/liteAccordion.jquery.min.js" type="text/javascript"></script>
     <script src="/javascripts/d3.v3.min.js" type="text/javascript"></script>
-    <script src="/javascripts/jquery-ui.min.js" type="text/javascript"></script>
     <script src="/javascripts/jquery.tablesorter.min.js" type="text/javascript"></script>
     <script src="/javascripts/Chart.js" type="text/javascript"></script>
     <script src="/javascripts/Slider.js" type="text/javascript"></script>
