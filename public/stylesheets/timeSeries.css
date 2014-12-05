@@ -15,6 +15,10 @@ h3 {
     line-height: 1em;
 }
 
+h3.company_label {
+    cursor: pointer;
+}
+
 /* -------------------- 
    ACCORDION
    -------------------- */

@@ -279,7 +279,7 @@ Model.prototype.getYatX = function(attribute, company, date) {
         if (this.data[attribute][i].company === company)
             data = this.data[attribute][i].values;
     }
-    console.log(data);
+    
     for (var i = 0; i < data.length; i++) {
         if (date >= data[i]['date']) {
             return (Math.abs(date - data[i]['date']) <= 

@@ -62,11 +62,20 @@ app.get('/industry/*', function(req, res) {
     var no_data = false;
     var queries_done = 0;
     
-    var query1 = 'select year, avg(dividendvalue) as dividendvalue, ' +
+    /*var query1 = 'select year, avg(dividendvalue) as dividendvalue, ' +
                 'avg(percentchange) as percentchange from ' +
                 'companyinfo join companies where companyinfo.tickersymbol ' +
                 '= companies.tickersymbol and companies.industry = "' +
-                industry + '" group by year';
+                industry + '" group by year';*/
+    
+    var query1 = 'select year, avg(dividendvalue) as dividendvalue, ' +
+                'avg(percentchange) as percentchange from ' +
+                'companyinfo join companies where companyinfo.tickersymbol ' +
+                '= companies.tickersymbol';
+    if (industry !== 'All')
+        query1 += ' and companies.industry = "' + industry + '"';
+    query1 += ' group by year';
+    
     db.query(query1, function(err, rows) {
         if (err) return res.status(500).send('Server Error');
         if (rows.length === 0) return res.status(204).end();
@@ -75,9 +84,14 @@ app.get('/industry/*', function(req, res) {
         if (queries_done == 2) return res.json(data);
     });
     
+//    var query2 = 'select companyname, tickersymbol, industry, noyears ' +
+//                'from companies where industry like "%' + industry + '%"';
     var query2 = 'select companyname, tickersymbol, industry, noyears ' +
-                'from companies where industry like "%' + industry + '%"';
-    console.log(query2);
+                'from companies';
+    if (industry !== 'All') 
+        query2 += ' where industry = "' + industry + '"';
+    query2 += ' order by noyears desc, tickersymbol asc';
+    
     db.query(query2, function(err, rows) {
         if (err) return res.status(500).send('Server Error');
         if (rows.length === 0) return res.status(204).end();

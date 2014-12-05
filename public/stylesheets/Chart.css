@@ -23,6 +23,11 @@ div#charts .axis.x {
 .line {
     fill: none;
     stroke-width: 1.5px;
+    transition: stroke-width 0.5s;
+}
+
+.line.hovered {
+    stroke-width: 4.0px;
 }
 
 .brush .extent {

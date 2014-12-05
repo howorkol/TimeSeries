@@ -28,6 +28,10 @@ d3.json('/industries', function(err, data) {
     });
 });
 
+$('form#searchBox span#browse').click(function() {
+    new_industry('All');
+});
+
 /*
 $('div#visualizations ul').sortable({
     'disabled': true,
@@ -94,7 +98,31 @@ $('form#searchBox > input.button').click(function () {
         'name': $('form#searchBox .select option:selected').attr('name')
     }*/
     var industry = $('form#searchBox input.text').val();
+    new_industry(industry);
+    /*
+    $('div#visualizations ul svg').remove();
+    $('h3.company_label').remove();
+    $('#company_table tbody tr').remove();
+    model = new Model();
+    //$('div#visualizations ul').sortable('option', 'disabled', true);
+    selected_company = null;
     
+    add_industry(industry, function(err) {
+        if (err) {
+            console.log('No data for ' + industry);
+            return false;
+        }
+        
+        disable_slides = false;
+        $('h1.industry_name').text(industry);
+        $('ol li:nth-child(2) span').click();
+        $('form#searchBox > input.text').val('');
+        //$('form#searchBox select option').remove();
+        
+    });*/
+});
+
+function new_industry(industry) {
     $('div#visualizations ul svg').remove();
     $('h3.company_label').remove();
     $('#company_table tbody tr').remove();
@@ -115,20 +143,21 @@ $('form#searchBox > input.button').click(function () {
         //$('form#searchBox select option').remove();
         
     });
-});
+}
 
 $('span.slide_title').click(function() {
     if (disable_slides === true) { return false; }
 });
 
+/*
 $('div#compare_cont > div').click(function () {
     if (!$(this).hasClass('selected')) {
         $('div#compare_cont > div').toggleClass('selected');
         $('div.main_div > table.comp_table').toggleClass('selected');
     }
-});
+});*/
 
-
+/*
 $('input#add').click(function() {
     add_attribute(total.toString(), function(err) {
         
@@ -136,8 +165,9 @@ $('input#add').click(function() {
         //var full_height = model.get_num_attributes() * Chart.prototype.height;
         //$('div#charts').animate({scrollTop: full_height}, 'slow');
     });
-});
+});*/
 
+/*
 $('div.secondary_div input.button').click(function() {
     var company = $('div.secondary_div input.text').val();
     
@@ -149,7 +179,7 @@ $('div.secondary_div input.button').click(function() {
         
         $('div.secondary_div input.text').val('');
     });
-    /*
+    
     get_tickers(search_term, function(err, company_info) {
         if (err) {
             console.log('No results found.');
@@ -162,8 +192,8 @@ $('div.secondary_div input.button').click(function() {
             }
             $('div.secondary_div input.text').val('');
         });
-    });*/
-});
+    });
+});*/
 
 
 

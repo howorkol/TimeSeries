@@ -10,13 +10,20 @@ function add_industry(industry, callback) {
             return;
         }
         
-        model.add_company(industry + ' Average', data.average, data.companies);
+        model.add_company('Average', data.average, data.companies);
         
         d3.select('div#visulaization_slide div.secondary_div').append('h3')
             .attr('class', 'company_label')
+            .attr('id', 'Average')
             .attr('title', industry + ' Average')
-            .style('color', model.get_color(industry + ' Average'))
-            .text('Average');
+            .style('color', model.get_color('Average'))
+            .text('Average')
+            .on('mouseenter', function() {
+                hover_company_name('Average');
+            })
+            .on('mouseleave', function() {
+                remove_company_hover();
+            });
         
         callback(null);
     });
@@ -35,12 +42,11 @@ function add_company(company, callback) {
             callback(err);
             return;
         }
-        console.log(data);
+       
         // Add the data to the model.
         model.add_company(company, data);
         
         // Add the company title to the legend.
-        
         d3.select('div#visulaization_slide div.secondary_div').append('h3')
             .attr('class', 'company_label')
             .attr('id', company)
@@ -48,16 +54,32 @@ function add_company(company, callback) {
             .style('color', function() {
                 return model.get_color(company);
             })
-            .text(company);
-            /*.on('click', function() {
-                click_company_name(company);
-            });*/
+            .text(company)
+            .on('mouseenter', function() {
+                hover_company_name(company);
+            })
+            .on('mouseleave', function() {
+                remove_company_hover();
+            });
         
         $('#company_table tbody tr#' + company)
                 .children().css('background-color', model.get_color(company));
         
+        d3.lab("#4682b4").brighter();
+        
         callback(null);
     });
+}
+
+function hover_company_name(company) {
+    d3.selectAll('path#' + company)
+        .classed('hovered', true)
+        .moveToFront();
+}
+
+function remove_company_hover() {
+    d3.selectAll('g.chart path')
+        .classed('hovered', false);
 }
 
 function delete_company(company_name, callback) {
@@ -71,8 +93,9 @@ function delete_company(company_name, callback) {
 d3.selection.prototype.moveToFront = function() {
     // Info found here 
     // http://stackoverflow.com/questions/14167863/how-can-i-bring-a-circle-to-the-front-with-d3
-    return this.each(function(){
-        this.parentNode.appendChild(this);
+    return this.each(function() {
+        var par = this.parentNode;
+        par.parentNode.appendChild(par);
     });
 };
 
