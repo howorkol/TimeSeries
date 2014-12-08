@@ -17,7 +17,7 @@ var Model = function() {
     this.used_colors = {};
     $('div#slider svg').remove();
     
-    this.data = { attributes: {} };
+    this.data = {};
     
     this.add_attribute('dividendvalue');
     this.add_attribute('percentchange');
@@ -267,11 +267,40 @@ Model.prototype.value_range = function(attribute) {
     return [min, max];
 }
 
+Model.prototype.getClosestValues = function(attribute, date) {
+    if (date === undefined) return null;
+    var data = { values: {} };
+    
+    for (var i = 0; i < this.data[attribute].length; i++) {
+        var d = this.data[attribute][i];
+        for (var j = 0; j < d.values.length; j++) {
+            if (d.values[j]['date'] >= date) {
+                // Found the first date larger than what we are hovering.
+                if ((j === 0) || (Math.abs(date - d.values[j]['date']) <= 
+                                      Math.abs(date - d.values[j - 1]['date']))) {
+                    data['values'][d['company']] = d.values[j]['value'];
+                    if (data['closest_date'] === undefined)
+                        data['closest_date'] = d.values[j]['date'];
+                    
+                } else {
+                    data['values'][d['company']] = d.values[j - 1]['value'];
+                    if (data['closest_date'] === undefined)
+                        data['closest_date'] = d.values[j - 1]['date'];
+                }
+                
+                break;
+            }
+        }
+    }
+    
+    return data;
+}
+
 /*
     getYatX
     Given an attribute, company, and data, returns to value of the company
     for that attribute at the closest point to date.
-*/
+*//*
 Model.prototype.getYatX = function(attribute, company, date) {
     var data;
     
@@ -288,5 +317,5 @@ Model.prototype.getYatX = function(attribute, company, date) {
                 : data[i - 1]['value'];
         }
     }
-}
+}*/
 

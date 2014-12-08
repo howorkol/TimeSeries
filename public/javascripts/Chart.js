@@ -41,26 +41,25 @@ Chart.prototype.make_chart = function() {
     
     // Create the svg element to hold everything.
     this.svg.attr('width',  $(chart_container).width())
-        .attr('height', this.height);
-    
-        /*.on('mousemove', function() {
+        .attr('height', this.height)
+        .on('mousemove', function() {
             var x_coor = d3.mouse(this)[0] - margin.left - 1;
             var y_coor = d3.mouse(this)[1] - margin.top - 27;
-            var x0 = x.invert(x_coor);
+            if ((x_coor < 0) || (x_coor > chart_width) || 
+                    (y_coor < 0) || (y_coor > chart_height)) return;
             
-            if ((x_coor < 0) || (y_coor < 0) || (being_sorted)) {
-                cursor_out();
-                return null;
+            var x0 = x.invert(x_coor);
+            var hovered_data = model.getClosestValues(attribute, x0);
+            
+            for (company in hovered_data.values) {
+                d3.select('g#' + attribute + ' .yValue_group#' + company + ' .yValue')
+                    .text(hovered_data.values[company]);
             }
-
-            d3.selectAll('line.xLine').style('opacity', 1)
-                .attr('transform', 'translate(' + (margin.left + x(x0)) + 
-                      ',' + (margin.top + 25) + ')');
-            d3.selectAll('text#xDate').text(d3.time.format('%a %b %d %Y')(x0));
-
-            model.chart_hover(x0);
-        
-        }).on('mouseleave', cursor_out);*/
+        })
+        .on('mouseout', function() {
+            d3.selectAll('g#' + attribute + ' .yValue_group .yValue')
+                .text('');
+        });
     
     // The clip path area is where is chart is allowed to show through.
     // When the user selects an area with the slider, the line widths are
