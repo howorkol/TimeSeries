@@ -22,12 +22,11 @@ div#charts .axis.x {
 
 .line {
     fill: none;
-    stroke-width: 1.5px;
-    transition: stroke-width 0.5s;
+    stroke-width: 2.5px;
 }
 
-.line.hovered {
-    stroke-width: 4.0px;
+.line.deselected {
+    opacity: 0.1;
 }
 
 .brush .extent {
@@ -38,4 +37,8 @@ div#charts .axis.x {
 
 line.xLine {
     stroke: #747474;
+}
+
+.hidden {
+    opacity: 0;
 }

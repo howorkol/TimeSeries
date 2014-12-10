@@ -1,7 +1,7 @@
 var chart_height;
 
 var parseDate = d3.time.format("%Y-%m-%d").parse;
-var total = 0;
+var clicked_companies = [];
 
 function add_industry(industry, callback) {
     d3.json('/industry/' + industry, function(err, data) {
@@ -18,11 +18,8 @@ function add_industry(industry, callback) {
             .attr('title', industry + ' Average')
             .style('color', model.get_color('Average'))
             .text('Average')
-            .on('mouseenter', function() {
-                hover_company_name('Average');
-            })
-            .on('mouseleave', function() {
-                remove_company_hover();
+            .on('click', function() {
+                click_company('Average');
             });
         
         callback(null);
@@ -55,38 +52,49 @@ function add_company(company, callback) {
                 return model.get_color(company);
             })
             .text(company)
-            .on('mouseenter', function() {
-                hover_company_name(company);
-            })
-            .on('mouseleave', function() {
-                remove_company_hover();
+            .on('click', function() {
+                click_company(company);
             });
         
-        $('#company_table tbody tr#' + company)
-                .children().css('background-color', model.get_color(company));
-        
-        d3.lab("#4682b4").brighter();
+        $('#company_table tbody tr#' + company).children()
+            .css('background-color', model.get_color(company))
+            .css('opacity', '0.7');
         
         callback(null);
     });
 }
 
+function click_company(company) {
+    if (clicked_companies.indexOf(company) === -1) {
+        clicked_companies.push(company);
+        d3.selectAll('g.chart path#' + company)
+            .classed('deselected', true)
+            .moveToFront();
+    } else {
+        var index = clicked_companies.indexOf(company);
+        clicked_companies.splice(index, 1);
+        d3.selectAll('g.chart path#' + company)
+            .classed('deselected', false);
+    }
+}
+/*
 function hover_company_name(company) {
-    d3.selectAll('path#' + company)
+    d3.selectAll('g.chart path#' + company)
         .classed('hovered', true)
         .moveToFront();
 }
 
-function remove_company_hover() {
-    d3.selectAll('g.chart path')
+function remove_company_hover(company) {
+    d3.selectAll('g.chart path#' + company)
         .classed('hovered', false);
 }
-
+*/
 function delete_company(company_name, callback) {
     model.delete_company(company_name);
     $('h3.company_label#' + company_name).remove();
-    $('#company_table tbody tr#' + company_name)
-            .children().css('background-color', '');
+    $('#company_table tbody tr#' + company_name).children()
+        .css('background-color', '')
+        .css('opacity', '');
     callback();
 }
 

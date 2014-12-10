@@ -1,5 +1,5 @@
 var chart_container = 'div#visualizations div#charts ul';
-var margin = {top: 3, right: 0, bottom: 15, left: 65, s_bottom: 20};
+var margin = {top: 3, right: 1, bottom: 15, left: 65, s_bottom: 20};
 
 var Chart = function(attribute) {
     this.attribute = attribute;
@@ -33,6 +33,8 @@ Chart.prototype.make_chart = function() {
     var chart_height = this.height - margin.top - margin.bottom;
     var chart_width = this.width - margin.left - margin.right;
     var attribute = this.attribute;
+    var xLine;
+    var x;
     
     var cursor_out = function() {
         d3.selectAll('line.xLine').style('opacity', 0);
@@ -46,20 +48,31 @@ Chart.prototype.make_chart = function() {
             var x_coor = d3.mouse(this)[0] - margin.left - 1;
             var y_coor = d3.mouse(this)[1] - margin.top - 27;
             if ((x_coor < 0) || (x_coor > chart_width) || 
-                    (y_coor < 0) || (y_coor > chart_height)) return;
+                    (y_coor < 0) || (y_coor > chart_height)) {
+                mouseout();
+                return;
+            }
             
             var x0 = x.invert(x_coor);
             var hovered_data = model.getClosestValues(attribute, x0);
             
             for (company in hovered_data.values) {
                 d3.select('g#' + attribute + ' .yValue_group#' + company + ' .yValue')
-                    .text(hovered_data.values[company]);
+                    .text(d3.format(".3r")(hovered_data.values[company]));
             }
+        
+            
+            xLine.classed('hidden', false)
+                .attr('transform', 'translate(' + 
+                      (margin.left + x(hovered_data.closest_date)) + ',0)');
         })
-        .on('mouseout', function() {
-            d3.selectAll('g#' + attribute + ' .yValue_group .yValue')
-                .text('');
-        });
+        .on('mouseout', mouseout);
+    
+    function mouseout() {
+        d3.selectAll('g#' + attribute + ' .yValue_group .yValue')
+            .text('');
+        xLine.classed('hidden', true);
+    }
     
     // The clip path area is where is chart is allowed to show through.
     // When the user selects an area with the slider, the line widths are
@@ -77,7 +90,7 @@ Chart.prototype.make_chart = function() {
         .attr('id', this.attribute)
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    var x = this.x.range([1, chart_width]);
+    x = this.x.range([1, chart_width]);
     
     // Grab and set the y domain and range. The domain depends on the 
     // data for this attribute, range depends on chart height.
@@ -117,11 +130,11 @@ Chart.prototype.make_chart = function() {
         .attr('class', 'line_group')
         .attr('clip-path', 'url(#clip_' + this.attribute + ')');
     
-    this.svg.append('line')
-        .attr('class', 'xLine')
-        .style('opacity', 0)
-        .attr('y1', 0)
-        .attr('y2', chart_height - 25);
+    xLine = this.svg.append('line')
+        .attr('class', 'xLine hidden')
+        .attr('y1', 28)
+        .attr('y2', chart_height + 3);;
+        //.attr('transform', 'translate(' + margin.left + ',0)');
     
     this.svg.append('text')
         .attr('id', 'xDate')
