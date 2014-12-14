@@ -19,7 +19,7 @@ var Model = function() {
     
     this.data = {};
     
-    this.add_attribute('dividendvalue');
+    this.add_attribute('dividendspaid');
     this.add_attribute('percentchange');
     
 }
@@ -131,7 +131,7 @@ Model.prototype.add_company = function(company_name, new_data, all_companies) {
         'company': company_name,
         'color'  : this.get_color(company_name),
         'values' : new_data.map(function(d) {
-            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['dividendvalue'] };
+            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['dividendspaid'] };
         })
     }
     

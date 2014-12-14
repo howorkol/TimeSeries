@@ -3,8 +3,8 @@ var chart_height;
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 var clicked_companies = [];
 
-function add_industry(industry, callback) {
-    d3.json('/industry/' + industry, function(err, data) {
+function add_industry(sector, callback) {
+    d3.json('/sector/' + sector, function(err, data) {
         if (err) {
             callback(err);
             return;
@@ -15,7 +15,7 @@ function add_industry(industry, callback) {
         d3.select('div#visulaization_slide div.secondary_div').append('h3')
             .attr('class', 'company_label')
             .attr('id', 'Average')
-            .attr('title', industry + ' Average')
+            .attr('title', sector + ' Average')
             .style('color', model.get_color('Average'))
             .text('Average')
             .on('click', function() {
@@ -112,7 +112,7 @@ function update_company_table(all_companies) {
         var data = all_companies[i];
         var html = '<tr id="' + data.tickersymbol + '"><td>' + data.companyname + 
                 '</td><td>' + data.tickersymbol + '</td><td>' + data.industry + 
-                '</td><td>' + data.noyears + '</td></tr>';
+                '</td><td>' + data.sector + '</td><td>' + data.consecutiveyears + '</td></tr>';
         $('#company_table tbody').append(html);
         $('#company_table').trigger('update');
     }

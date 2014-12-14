@@ -10,8 +10,8 @@ var express     = require('express'),
 
 var db = mysql.createConnection({
     host: 'localhost',
-    user: 'username',
-    password: 'userpass',
+    user: 'timeseries',
+    password: 'timepass',
     database: 'timeseries'
 });
 db.connect();
@@ -28,25 +28,9 @@ app.use('/images', serveStatic(__dirname + '/public/images'));
 app.get('/', serveStatic(__dirname + '/'));
 app.get('/query/*', function(req, res) {
     var company = parse(req.url).pathname.substring(7);
-    var query = 'select year, dividendvalue, percentchange from ' +
-                'companyinfo where tickersymbol="' + company + '"';
+    var query = 'select year, dividendspaid, percentchange from ' +
+                'companydata where tickersymbol="' + company + '"';
     
-    db.query(query, function(err, rows) {
-        if (err)
-            return res.status(500).send('Server Error');
-        
-        if (rows.length === 0)
-            return res.status(204).end();
-        else
-            return res.json(rows);
-    });
-});
-
-app.get('/industries', function(req, res) {
-    var industry = parse(req.url).pathname.substring(12);
-    
-    var query = 'select industry, count(*) as count from companies group by industry ' +
-        'order by industry asc';
     db.query(query, function(err, rows) {
         if (err) return res.status(500).send('Server Error');
         if (rows.length === 0) return res.status(204).end();
@@ -54,26 +38,37 @@ app.get('/industries', function(req, res) {
     });
 });
 
-app.get('/industry/*', function(req, res) {
-    var industry = parse(req.url).pathname.substring(10).replace(/%20/g, ' ');
+app.get('/sectors', function(req, res) {
+    var sector = parse(req.url).pathname.substring(12);
     
+    var query = 'select distinct sector from companies';
+    db.query(query, function(err, rows) {
+	if (err) return res.status(500).send('Server Error');
+        if (rows.length === 0) return res.status(204).end();
+        return res.json(rows);
+    });
+});
+
+app.get('/sector/*', function(req, res) {
+    var sector = parse(req.url).pathname.substring(8).replace(/%20/g, ' ');
+    console.log(sector); 
     var data = {};
     var error;
     var no_data = false;
     var queries_done = 0;
     
-    /*var query1 = 'select year, avg(dividendvalue) as dividendvalue, ' +
-                'avg(percentchange) as percentchange from ' +
-                'companyinfo join companies where companyinfo.tickersymbol ' +
+    /*var query1 = 'select year, avg(dividendspaid) as DividendsPaid, ' +
+                'avg(percentchange) as PercentChange from ' +
+                'companydata join companies where companydata.tickersymbol ' +
                 '= companies.tickersymbol and companies.industry = "' +
                 industry + '" group by year';*/
     
-    var query1 = 'select year, avg(dividendvalue) as dividendvalue, ' +
+    var query1 = 'select year, avg(dividendspaid) as dividendspaid, ' +
                 'avg(percentchange) as percentchange from ' +
-                'companyinfo join companies where companyinfo.tickersymbol ' +
+                'companydata join companies where companydata.tickersymbol ' +
                 '= companies.tickersymbol';
-    if (industry !== 'All')
-        query1 += ' and companies.industry = "' + industry + '"';
+    if (sector !== 'All')
+        query1 += ' and companies.sector = "' + sector + '"';
     query1 += ' group by year';
     
     db.query(query1, function(err, rows) {
@@ -86,11 +81,11 @@ app.get('/industry/*', function(req, res) {
     
 //    var query2 = 'select companyname, tickersymbol, industry, noyears ' +
 //                'from companies where industry like "%' + industry + '%"';
-    var query2 = 'select companyname, tickersymbol, industry, noyears ' +
+    var query2 = 'select companyname, tickersymbol, industry, sector, consecutiveyears ' +
                 'from companies';
-    if (industry !== 'All') 
-        query2 += ' where industry = "' + industry + '"';
-    query2 += ' order by noyears desc, tickersymbol asc';
+    if (sector !== 'All') 
+        query2 += ' where sector = "' + sector + '"';
+    query2 += ' order by consecutiveyears desc, tickersymbol asc';
     
     db.query(query2, function(err, rows) {
         if (err) return res.status(500).send('Server Error');

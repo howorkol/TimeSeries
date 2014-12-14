@@ -11,8 +11,8 @@ $('#accordion_cont').liteAccordion({
 
 $(".tablesorter").tablesorter();
 
-d3.json('/industries', function(err, data) {
-    var industry_list = [];
+d3.json('/sectors', function(err, data) {
+    var sector_list = [];
         
     if (err) {
         callback(err);
@@ -20,11 +20,11 @@ d3.json('/industries', function(err, data) {
     }
 
     data.forEach(function(d) {
-        industry_list.push(d.industry);
+        sector_list.push(d.sector);
     });
-    
+
     $('form#searchBox > input.text').autocomplete({
-        source: industry_list
+        source: sector_list
     });
 });
 
