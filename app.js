@@ -6,7 +6,10 @@ var express     = require('express'),
     favicon     = require('serve-favicon'),
     logger      = require('morgan'),
     serveStatic = require('serve-static'),
-    mysql       = require('mysql');
+    mysql       = require('mysql'),
+    fs          = require('fs');
+
+var logFile = fs.createWriteStream(__dirname + '/timeseries.log', {flags: 'a'});
 
 var db = mysql.createConnection({
     host: 'localhost',
@@ -20,10 +23,11 @@ var app = express();
 
 app.set('port', process.env.PORT || _port);
 //app.use(favicon());
-app.use(logger('dev'));
 app.use('/stylesheets', serveStatic(__dirname + '/public/stylesheets'));
 app.use('/javascripts', serveStatic(__dirname + '/public/javascripts'));
 app.use('/images', serveStatic(__dirname + '/public/images'));
+
+app.use(logger('common', {stream: logFile}));
 
 app.get('/', serveStatic(__dirname + '/'));
 app.get('/query/*', function(req, res) {
@@ -51,18 +55,11 @@ app.get('/sectors', function(req, res) {
 
 app.get('/sector/*', function(req, res) {
     var sector = parse(req.url).pathname.substring(8).replace(/%20/g, ' ');
-    console.log(sector); 
     var data = {};
     var error;
     var no_data = false;
     var queries_done = 0;
-    
-    /*var query1 = 'select year, avg(dividendspaid) as DividendsPaid, ' +
-                'avg(percentchange) as PercentChange from ' +
-                'companydata join companies where companydata.tickersymbol ' +
-                '= companies.tickersymbol and companies.industry = "' +
-                industry + '" group by year';*/
-    
+   
     var query1 = 'select year, avg(dividendspaid) as dividendspaid, ' +
                 'avg(percentchange) as percentchange from ' +
                 'companydata join companies where companydata.tickersymbol ' +
@@ -79,10 +76,8 @@ app.get('/sector/*', function(req, res) {
         if (queries_done == 2) return res.json(data);
     });
     
-//    var query2 = 'select companyname, tickersymbol, industry, noyears ' +
-//                'from companies where industry like "%' + industry + '%"';
-    var query2 = 'select companyname, tickersymbol, industry, sector, consecutiveyears ' +
-                'from companies';
+    var query2 = 'select companyname, tickersymbol, industry, sector, ' +
+		'consecutiveyears from companies';
     if (sector !== 'All') 
         query2 += ' where sector = "' + sector + '"';
     query2 += ' order by consecutiveyears desc, tickersymbol asc';
