@@ -21,7 +21,8 @@ var Model = function() {
     
     this.add_attribute('dividendspaid');
     this.add_attribute('percentchange');
-    
+    //this.add_attribute('open');    
+    //this.add_attribute('close');
 }
 
 /*
@@ -122,11 +123,38 @@ Model.prototype.delete_attribute = function(attribute_name) {
     Add a company to the data set and assign it a color.
     All charts are updated to reflect the new company.
 */
-Model.prototype.add_company = function(company_name, new_data, all_companies) {
+Model.prototype.add_company = function(company_name) {
     // Add the new company to the company_list and assign it a color.
     this.company_list.push(company_name);
     this.used_colors[company_name] = this.unused_color_list.shift();
     
+    //this.add_db_data(company_name, new_data, all_companies);
+/*
+    this.data[this.attribute_list[0]][this.company_list.length - 1] = {
+        'company': company_name,
+        'color'  : this.get_color(company_name),
+        'values' : new_data.map(function(d) {
+            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['dividendspaid'] };
+        })
+    }
+    
+    this.data[this.attribute_list[1]][this.company_list.length - 1] = {
+        'company': company_name,
+        'color'  : this.get_color(company_name),
+        'values' : new_data.map(function(d) {
+            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['percentchange'] };
+        })
+    }
+    
+    if (all_companies) {
+        this.all_companies = all_companies;
+        update_company_table(this.all_companies);
+    }
+    
+    this.update_charts();*/
+}
+
+Model.prototype.add_db_data = function(company_name, new_data, all_companies) { 
     this.data[this.attribute_list[0]][this.company_list.length - 1] = {
         'company': company_name,
         'color'  : this.get_color(company_name),
