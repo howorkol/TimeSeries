@@ -93,33 +93,8 @@ $('form').submit(function() {
 });
 
 $('form#searchBox > input.button').click(function () {
-    /*var company = {
-        'ticker': $('form#searchBox .select option:selected').attr('ticker'),
-        'name': $('form#searchBox .select option:selected').attr('name')
-    }*/
     var industry = $('form#searchBox input.text').val();
     new_industry(industry);
-    /*
-    $('div#visualizations ul svg').remove();
-    $('h3.company_label').remove();
-    $('#company_table tbody tr').remove();
-    model = new Model();
-    //$('div#visualizations ul').sortable('option', 'disabled', true);
-    selected_company = null;
-    
-    add_industry(industry, function(err) {
-        if (err) {
-            console.log('No data for ' + industry);
-            return false;
-        }
-        
-        disable_slides = false;
-        $('h1.industry_name').text(industry);
-        $('ol li:nth-child(2) span').click();
-        $('form#searchBox > input.text').val('');
-        //$('form#searchBox select option').remove();
-        
-    });*/
 });
 
 function new_industry(industry) {
