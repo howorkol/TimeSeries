@@ -12,7 +12,7 @@ var Model = function() {
     this.attribute_list = [];
     this.charts = {};
     this.unused_color_list = [
-        '#c9c9c9', '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2'
+        '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2'
     ];
     this.used_colors = {};
     $('div#slider svg').remove();
@@ -21,8 +21,8 @@ var Model = function() {
     
     this.add_attribute('dividendspaid');
     this.add_attribute('percentchange');
-    //this.add_attribute('open');    
-    //this.add_attribute('close');
+    this.add_attribute('Close');
+    this.add_attribute('Volume');
 }
 
 /*
@@ -127,56 +127,36 @@ Model.prototype.add_company = function(company_name) {
     // Add the new company to the company_list and assign it a color.
     this.company_list.push(company_name);
     this.used_colors[company_name] = this.unused_color_list.shift();
-    
-    //this.add_db_data(company_name, new_data, all_companies);
-/*
-    this.data[this.attribute_list[0]][this.company_list.length - 1] = {
-        'company': company_name,
-        'color'  : this.get_color(company_name),
-        'values' : new_data.map(function(d) {
-            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['dividendspaid'] };
-        })
-    }
-    
-    this.data[this.attribute_list[1]][this.company_list.length - 1] = {
-        'company': company_name,
-        'color'  : this.get_color(company_name),
-        'values' : new_data.map(function(d) {
-            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['percentchange'] };
-        })
-    }
-    
-    if (all_companies) {
-        this.all_companies = all_companies;
-        update_company_table(this.all_companies);
-    }
-    
-    this.update_charts();*/
 }
 
 Model.prototype.add_db_data = function(company_name, new_data, all_companies) { 
-    this.data[this.attribute_list[0]][this.company_list.length - 1] = {
-        'company': company_name,
-        'color'  : this.get_color(company_name),
-        'values' : new_data.map(function(d) {
-            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['dividendspaid'] };
-        })
+    var attribute_list = this.attribute_list;
+
+    for (var i = 0; i < 2; i++) {
+        // Add dividendspaid and percentchange
+        this.data[this.attribute_list[i]][this.company_list.length - 1] = {
+            'company': company_name,
+            'color'  : this.get_color(company_name),
+            'values' : new_data.map(function(d) {
+                return { 'date': parseDate(d['year'] + '-01-01'), 'value': d[attribute_list[i]] };
+            })
+        }
     }
-    
-    this.data[this.attribute_list[1]][this.company_list.length - 1] = {
-        'company': company_name,
-        'color'  : this.get_color(company_name),
-        'values' : new_data.map(function(d) {
-            return { 'date': parseDate(d['year'] + '-01-01'), 'value': d['percentchange'] };
-        })
+}
+
+Model.prototype.add_quandl_data = function(company_name, new_data) {
+    var attribute_list = this.attribute_list;
+
+    for (var i = 0; i < 2; i++) {
+        // Add Close and Volume
+        this.data[attribute_list[i + 2]][this.company_list.length - 1] = {
+            'company': company_name,
+            'color'  : this.get_color(company_name),
+            'values' : new_data.map(function(d) {
+                return { 'date': parseDate(d['Date']), 'value': d[attribute_list[i + 2]] };
+            })
+        }
     }
-    
-    if (all_companies) {
-        this.all_companies = all_companies;
-        update_company_table(this.all_companies);
-    }
-    
-    this.update_charts();
 }
 
 /*
@@ -323,27 +303,3 @@ Model.prototype.getClosestValues = function(attribute, date) {
     
     return data;
 }
-
-/*
-    getYatX
-    Given an attribute, company, and data, returns to value of the company
-    for that attribute at the closest point to date.
-*//*
-Model.prototype.getYatX = function(attribute, company, date) {
-    var data;
-    
-    for (var i = 0; i < this.data[attribute].length; i++) {
-        if (this.data[attribute][i].company === company)
-            data = this.data[attribute][i].values;
-    }
-    
-    for (var i = 0; i < data.length; i++) {
-        if (date >= data[i]['date']) {
-            return (Math.abs(date - data[i]['date']) <= 
-                    Math.abs(date - data[i - 1]['date'])) 
-                ? data[i]['value'] 
-                : data[i - 1]['value'];
-        }
-    }
-}*/
-

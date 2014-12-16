@@ -4,11 +4,12 @@ var parseDate = d3.time.format("%Y-%m-%d").parse;
 var clicked_companies = [];
 
 function add_industry(sector, callback) {
-    model.add_company('Average');
+    //model.add_company('Average');
 
     d3.json('/sector/' + sector, function(err, data) {
         if (err) return callback(err);
-        model.add_db_data('Average', data.average, data.companies);
+        update_company_table(data.companies);
+        /*model.add_db_data('Average', data.average, data.companies);
         
         d3.select('div#visulaization_slide div.secondary_div').append('h3')
             .attr('class', 'company_label')
@@ -19,7 +20,7 @@ function add_industry(sector, callback) {
             .on('click', function() {
                 click_company('Average');
             });
-        
+        */
         callback(null);
     });
 }
@@ -31,17 +32,22 @@ function add_company(company, callback) {
     
     d3.json('/query/' + company, function(err, data) {
         if (err) return callback(err);
+        console.log(data);
         model.add_db_data(company, data);
-        if (++success === 1) return callback(null);
-    });
-
-/*
-    d3.json('call yahoo', function(err, data) {
-        if (err) return callback(err);
-        model.add_yahoo_data(company, data);
         if (++success === 2) return callback(null);
     });
-*/
+
+    query = 'https://www.quandl.com/api/v1/datasets/WIKI/' + company +
+            '.json?collapse=annual&auth_token=WczNwgPepRcbZR9Yf7qt'
+
+    d3.json(query, function(err, data) {
+        if (err) return callback(err);
+        data = data.data.map(function(d) {
+            return {'Date': d[0], 'Close': d[4], 'Volume': d[5]};
+        });
+        model.add_quandl_data(company, data);
+        if (++success === 2) return callback(null);
+    });
 }
 
 function click_company(company) {
@@ -57,18 +63,7 @@ function click_company(company) {
             .classed('deselected', false);
     }
 }
-/*
-function hover_company_name(company) {
-    d3.selectAll('g.chart path#' + company)
-        .classed('hovered', true)
-        .moveToFront();
-}
 
-function remove_company_hover(company) {
-    d3.selectAll('g.chart path#' + company)
-        .classed('hovered', false);
-}
-*/
 function delete_company(company_name, callback) {
     model.delete_company(company_name);
     callback(company_name);
@@ -105,6 +100,7 @@ function update_company_table(all_companies) {
             });
         } else add_company(company, function(err) {
             if (err) return;
+            model.update_charts();
             d3.select('div#visulaization_slide div.secondary_div')
                 .append('h3')
                 .attr('class', 'company_label')
