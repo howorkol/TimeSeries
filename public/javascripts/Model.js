@@ -138,7 +138,7 @@ Model.prototype.add_db_data = function(company_name, new_data, all_companies) {
             'company': company_name,
             'color'  : this.get_color(company_name),
             'values' : new_data.map(function(d) {
-                return { 'date': parseDate(d['year'] + '-01-01'), 'value': d[attribute_list[i]] };
+                return { 'date': parseDate(d['year'] + '-12-31'), 'value': d[attribute_list[i]] };
             })
         }
     }
@@ -278,28 +278,25 @@ Model.prototype.value_range = function(attribute) {
 Model.prototype.getClosestValues = function(attribute, date) {
     if (date === undefined) return null;
     var data = { values: {} };
-    
+    var closest_date;
+
+    if (date.getMonth() < 6)
+        closest_date = new Date(date.getFullYear() - 1, 11, 31);
+    else
+        closest_date = new Date(date.getFullYear(), 11, 31);
+    data['closest_date'] = closest_date;    
+
     for (var i = 0; i < this.data[attribute].length; i++) {
-        var d = this.data[attribute][i];
-        for (var j = 0; j < d.values.length; j++) {
-            if (d.values[j]['date'] >= date) {
-                // Found the first date larger than what we are hovering.
-                if ((j === 0) || (Math.abs(date - d.values[j]['date']) <= 
-                                      Math.abs(date - d.values[j - 1]['date']))) {
-                    data['values'][d['company']] = d.values[j]['value'];
-                    if (data['closest_date'] === undefined)
-                        data['closest_date'] = d.values[j]['date'];
-                    
-                } else {
-                    data['values'][d['company']] = d.values[j - 1]['value'];
-                    if (data['closest_date'] === undefined)
-                        data['closest_date'] = d.values[j - 1]['date'];
-                }
-                
-                break;
-            }
+        var company = this.data[attribute][i];
+        var value = null;
+        for (var j = 0; j < company.values.length; j++) {
+            // This company doesn't have data for this date.
+            if (company.values[j]['date'] > closest_date) break;
+            // Found the correct data.
+            else if (+company.values[j]['date'] === +closest_date)
+                value = company.values[j]['value'];
         }
+        data['values'][company['company']] = value;
     }
-    
     return data;
 }

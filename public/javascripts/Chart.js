@@ -1,5 +1,5 @@
 var chart_container = 'div#visualizations div#charts ul';
-var margin = {top: 3, right: 1, bottom: 15, left: 65, s_bottom: 20};
+var margin = {top: 6, right: 1, bottom: 15, left: 65, s_bottom: 20};
 
 var Chart = function(attribute) {
     this.attribute = attribute;
@@ -55,12 +55,15 @@ Chart.prototype.make_chart = function() {
             
             var x0 = x.invert(x_coor);
             var hovered_data = model.getClosestValues(attribute, x0);
-            
+
             for (company in hovered_data.values) {
-                d3.select('g#' + attribute + ' .yValue_group#' + company + ' .yValue')
-                    .text(d3.format(".3r")(hovered_data.values[company]));
+                d3.select('g#' + attribute + ' .yValue_group#' + company + 
+                          ' .yValue')
+                    .text(function() {
+                        if (hovered_data.values[company] === null) return '';
+                        return d3.format('.3r')(hovered_data.values[company]);
+                    });
             }
-        
             
             xLine.classed('hidden', false)
                 .attr('transform', 'translate(' + 
@@ -106,7 +109,8 @@ Chart.prototype.make_chart = function() {
     this.xAxis = d3.svg.axis().scale(this.x).orient('bottom')
         .tickSize(-chart_height, 0, 0);
     this.yAxis = d3.svg.axis().scale(this.y).orient('left')
-        .tickSize(-chart_width, 0, 0).ticks(5);
+        .tickSize(-chart_width, 0, 0).ticks(5)
+        .tickFormat(formatTicks);
     
     // Append the x axis.
     this.chart_group.append('g')
@@ -135,13 +139,22 @@ Chart.prototype.make_chart = function() {
         .attr('y1', 28)
         .attr('y2', chart_height + 3);;
         //.attr('transform', 'translate(' + margin.left + ',0)');
-    
+
+    function formatTicks(d) {
+        if (d == 0) return '0';
+        else if (d < 1) return d3.format('.2f')(d);
+        else if (d < 10) return d3.format('.1f')(d);
+        else if (d < 1000) return d3.format('d')(d);
+        else if (d < 1e6) return d3.format('d')(d / 1e3) + 'K';
+        else return d3.format('d')(d / 1e6) + 'M';
+    }
+/*    
     this.svg.append('text')
         .attr('id', 'xDate')
         .attr('font-size', '.9em')
         .attr('transform', 'translate(' + (chart_width + margin.left - 6) + ', 20)')
         .attr('text-anchor', 'end');
-    
+  */  
     //this.update_chart();
 }
 
@@ -185,7 +198,7 @@ Chart.prototype.update_chart = function() {
         .text(function(d) { return d.company; });
     yValue_group.append('text')
         .attr('class', 'yValue')
-        .attr('transform', 'translate(0, 13)')
+        .attr('transform', 'translate(0, 12)')
         .attr('fill', 'black');
     
     // Applied to all lines.
@@ -197,14 +210,7 @@ Chart.prototype.update_chart = function() {
         .transition().duration(500)
         .attr('transform', function(d) {
             var i = model.company_index(d.company);
-            if (i == 0) {
-                return 'translate(' + (chart_width - 10) + ',10)';
-            } else {
-                return 'translate(' + ((i - 1) * chart_width / 10) + ',10)';
-            }
-        }).attr('text-anchor', function(d) {
-            if (model.company_index(d.company) == 0)
-                return 'end';
+            return 'translate(' + (i * chart_width / 10) + ',13)';
         });
     
     // Remove lines that no longer have data.

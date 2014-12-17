@@ -42,7 +42,7 @@ function add_company(company, callback) {
 
     d3.json(query, function(err, data) {
         if (err) return callback(err);
-        data = data.data.map(function(d) {
+        data = data.data.reverse().map(function(d) {
             return {'Date': d[0], 'Close': d[4], 'Volume': d[5]};
         });
         model.add_quandl_data(company, data);
