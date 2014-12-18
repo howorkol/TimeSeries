@@ -11,7 +11,7 @@ $('#accordion_cont').liteAccordion({
 
 $(".tablesorter").tablesorter();
 
-d3.json('/sectors', function(err, data) {
+d3.json('/query/sectors', function(err, data) {
     var sector_list = [];
         
     if (err) {

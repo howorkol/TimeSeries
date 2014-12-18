@@ -6,21 +6,9 @@ var clicked_companies = [];
 function add_industry(sector, callback) {
     //model.add_company('Average');
 
-    d3.json('/sector/' + sector, function(err, data) {
+    d3.json('/query/sector/' + sector, function(err, data) {
         if (err) return callback(err);
-        update_company_table(data.companies);
-        /*model.add_db_data('Average', data.average, data.companies);
-        
-        d3.select('div#visulaization_slide div.secondary_div').append('h3')
-            .attr('class', 'company_label')
-            .attr('id', 'Average')
-            .attr('title', sector + ' Average')
-            .style('color', model.get_color('Average'))
-            .text('Average')
-            .on('click', function() {
-                click_company('Average');
-            });
-        */
+        update_company_table(data);
         callback(null);
     });
 }
@@ -30,7 +18,7 @@ function add_company(company, callback) {
     company = company.toUpperCase();
     model.add_company(company);
     
-    d3.json('/query/' + company, function(err, data) {
+    d3.json('/query/company/' + company, function(err, data) {
         if (err) return callback(err);
         console.log(data);
         model.add_db_data(company, data);

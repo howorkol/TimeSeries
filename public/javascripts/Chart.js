@@ -56,6 +56,9 @@ Chart.prototype.make_chart = function() {
             var x0 = x.invert(x_coor);
             var hovered_data = model.getClosestValues(attribute, x0);
 
+            d3.select('g#' + attribute + ' text#xDate')
+                .text(d3.time.format('%b %e %Y')(hovered_data.closest_date));
+
             for (company in hovered_data.values) {
                 d3.select('g#' + attribute + ' .yValue_group#' + company + 
                           ' .yValue')
@@ -67,11 +70,12 @@ Chart.prototype.make_chart = function() {
             
             xLine.classed('hidden', false)
                 .attr('transform', 'translate(' + 
-                      (margin.left + x(hovered_data.closest_date)) + ',0)');
+                      (x(hovered_data.closest_date)) + ',0)');
         })
         .on('mouseout', mouseout);
     
     function mouseout() {
+        d3.selectAll('text#xDate').text('');
         d3.selectAll('g#' + attribute + ' .yValue_group .yValue')
             .text('');
         xLine.classed('hidden', true);
@@ -134,7 +138,7 @@ Chart.prototype.make_chart = function() {
         .attr('class', 'line_group')
         .attr('clip-path', 'url(#clip_' + this.attribute + ')');
     
-    xLine = this.svg.append('line')
+    xLine = this.chart_group.append('line')
         .attr('class', 'xLine hidden')
         .attr('y1', 28)
         .attr('y2', chart_height + 3);;
@@ -148,13 +152,13 @@ Chart.prototype.make_chart = function() {
         else if (d < 1e6) return d3.format('d')(d / 1e3) + 'K';
         else return d3.format('d')(d / 1e6) + 'M';
     }
-/*    
-    this.svg.append('text')
+    
+    this.chart_group.append('text')
         .attr('id', 'xDate')
         .attr('font-size', '.9em')
-        .attr('transform', 'translate(' + (chart_width + margin.left - 6) + ', 20)')
+        .attr('transform', 'translate(' + (chart_width - 6) + ', 20)')
         .attr('text-anchor', 'end');
-  */  
+    
     //this.update_chart();
 }
 
