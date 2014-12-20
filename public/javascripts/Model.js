@@ -146,7 +146,7 @@ Model.prototype.add_db_data = function(company_name, new_data, all_companies) {
 
 Model.prototype.add_quandl_data = function(company_name, new_data) {
     var attribute_list = this.attribute_list;
-
+    console.log(new_data);
     for (var i = 0; i < 2; i++) {
         // Add Close and Volume
         this.data[attribute_list[i + 2]][this.company_list.length - 1] = {
@@ -238,17 +238,21 @@ Model.prototype.date_range = function() {
     
     for (var attribute in this.data) {
         for (var i = 0; i < this.data[attribute].length; i++) {
-            var local_min = d3.min(this.data[attribute][i]['values'], function(d) {
+            if (!this.data[attribute][i]) continue;
+            var local_min = d3.min(this.data[attribute][i]['values'], 
+                    function(d) {
                 if (d['value'] !== null) return d['date'];
             });
-            var local_max = d3.max(this.data[attribute][i]['values'], function(d) {
+            var local_max = d3.max(this.data[attribute][i]['values'], 
+                    function(d) {
                 if (d['value'] !== null) return d['date'];
             });
             if ((min == undefined) || (local_min < min)) min = local_min;
             if ((max == undefined) || (local_max > max)) max = local_max;
         }
     }
-    return [min, max];
+    if (min && max) return [min, max];
+    else return [null, null];
 }
 
 /*
@@ -263,6 +267,7 @@ Model.prototype.value_range = function(attribute) {
     
     for (var i = 0; i < this.company_list.length; i++) {
         var curr_company = this.company_list[i];
+        if (!this.data[attribute][i]) continue;
         var local_min = d3.min(this.data[attribute][i]['values'], function(d) {
             if (d['value'] !== null) return d['value'];
         });
@@ -272,7 +277,9 @@ Model.prototype.value_range = function(attribute) {
         if ((min == undefined) || (local_min < min)) min = local_min;
         if ((max == undefined) || (local_max > max)) max = local_max;
     }
-    return [min, max];
+
+    if (min && max) return [min, max];
+    else return [0, 0];
 }
 
 Model.prototype.getClosestValues = function(attribute, date) {

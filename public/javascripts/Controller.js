@@ -20,7 +20,6 @@ function add_company(company, callback) {
     
     d3.json('/query/company/' + company, function(err, data) {
         if (err) return callback(err);
-        console.log(data);
         model.add_db_data(company, data);
         if (++success === 2) return callback(null);
     });
@@ -29,25 +28,29 @@ function add_company(company, callback) {
             '.json?collapse=annual&auth_token=WczNwgPepRcbZR9Yf7qt'
 
     d3.json(query, function(err, data) {
-        if (err) return callback(err);
-        data = data.data.reverse().map(function(d) {
-            return {'Date': d[0], 'Close': d[4], 'Volume': d[5]};
-        });
+        if (err) data = [{'Date': '2013-12-31', 'Close': null, 'Volume': null}];
+        else {
+            data = data.data.reverse().map(function(d) {
+                return {'Date': d[0], 'Close': d[4], 'Volume': d[5]};
+            });
+        }
+//        console.log(data);
         model.add_quandl_data(company, data);
         if (++success === 2) return callback(null);
+        
     });
 }
 
 function click_company(company) {
     if (clicked_companies.indexOf(company) === -1) {
         clicked_companies.push(company);
-        d3.selectAll('g.chart path#' + company)
+        d3.selectAll('g.chart path#' + company.replace('.', '\\.'))
             .classed('deselected', true)
             .moveToFront();
     } else {
         var index = clicked_companies.indexOf(company);
         clicked_companies.splice(index, 1);
-        d3.selectAll('g.chart path#' + company)
+        d3.selectAll('g.chart path#' + company.replace('.', '\\.'))
             .classed('deselected', false);
     }
 }
@@ -81,13 +84,15 @@ function update_company_table(all_companies) {
 
         if (model.company_present(company)) {
             delete_company(company, function(company_name) {
+                company_name = company_name.replace('.', '\\.');
                 $('h3.company_label#' + company_name).remove();
                 $('#company_table tbody tr#' + company_name).children()
                     .css('background-color', '')
                     .css('opacity', '');
             });
         } else add_company(company, function(err) {
-            if (err) return;
+            //if (err) return;
+            
             model.update_charts();
             d3.select('div#visulaization_slide div.secondary_div')
                 .append('h3')
@@ -102,7 +107,8 @@ function update_company_table(all_companies) {
                 click_company(company);
             });
 
-            $('#company_table tbody tr#' + company).children()
+            $('#company_table tbody tr#' + company.replace('.', '\\.'))
+                .children()
                 .css('background-color', model.get_color(company))
                 .css('opacity', '0.7');    
         });

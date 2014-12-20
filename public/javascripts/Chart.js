@@ -1,5 +1,5 @@
 var chart_container = 'div#visualizations div#charts ul';
-var margin = {top: 6, right: 1, bottom: 15, left: 65, s_bottom: 20};
+var margin = {top: 3, right: 1, bottom: 15, left: 65, s_bottom: 20};
 
 var Chart = function(attribute) {
     this.attribute = attribute;
@@ -17,7 +17,8 @@ Chart.prototype.transition_dur = 500;
 Chart.prototype.set_hover_values = function(x0) {
      for (var i = 0; i < model.get_num_companies(); i++) {
         var curr_company = model.get_company_by_index(i);
-        this.svg.select('g#' + curr_company + ' .yValue')
+        console.log(curr_company);
+        this.svg.select('g#' + curr_company.replace('.', '\.') + ' .yValue')
             .text(model.getYatX(this.attribute, curr_company, x0));
     }
 }
@@ -60,8 +61,8 @@ Chart.prototype.make_chart = function() {
                 .text(d3.time.format('%b %e %Y')(hovered_data.closest_date));
 
             for (company in hovered_data.values) {
-                d3.select('g#' + attribute + ' .yValue_group#' + company + 
-                          ' .yValue')
+                d3.select('g#' + attribute + ' .yValue_group#' + 
+                          company.replace('.', '\\.') + ' .yValue')
                     .text(function() {
                         if (hovered_data.values[company] === null) return '';
                         return d3.format('.3r')(hovered_data.values[company]);
@@ -186,16 +187,12 @@ Chart.prototype.update_chart = function() {
     enter.append('path').attr('class', 'line')
         .attr('id', function(d) { return d.company; })
         .attr('d', function(d) { return line(d.values); })
-        .attr('stroke', function(d) { 
-            return d.color;
-        })
+        .attr('stroke', function(d) { return d.color; })
         .attr('stroke-opacity', 0);
     
     var yValue_group = enter.append('g').attr('class', 'yValue_group')
         .attr('id', function(d) { return d.company; })
-        .attr('fill', function(d) { 
-            return d.color;
-        })
+        .attr('fill', function(d) { return d.color; })
         .attr('font-size', '.9em');
     
     yValue_group.append('text')
