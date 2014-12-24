@@ -18,14 +18,12 @@
         <h2><span class='slide_title'>Start</span></h2>
         <div>
         <div class='slide_container' id='start_slide'>
-            <form id='searchBox' autocomplete='off'>
-                <h1 class='title'>Search for an industry or 
-                    <span id='browse'>browse all</span>
+            <div id='listbox'>
+                <h1 class='title'>Begin by choosing a sector or 
+                    <span class='sector' id='browse'>browse all</span>.
                 </h1>
-                <input class='text' type="text" placeholder="Search...">
-                <input class='button' type="button" value="Search">
-            </form>
-            <ul id='listbox'></ul>
+                <ul id='sector_list'></ul>
+            </div>
         </div>
         </div>
     </li>
@@ -61,7 +59,7 @@
         <div class='slide_container' id='visulaization_slide'>
             <div class='page_top'>
                 <h1 class='title industry_name'>Placeholder</h1>
-                <h3>Placeholder</h3>
+                <h3>Hover charts to view data</h3>
             </div>
             <div class='main_div split' id='visualizations'>
                 <div id='charts' class='scroll_div'><ul></ul></div>
@@ -86,9 +84,7 @@
     <script src="/javascripts/d3.v3.min.js" type="text/javascript"></script>
     <script src="/javascripts/jquery.tablesorter.min.js" type="text/javascript"></script>
     <script src="/javascripts/Chart.js" type="text/javascript"></script>
-    <script src="/javascripts/Slider.js" type="text/javascript"></script>
     <script src="/javascripts/Model.js" type="text/javascript"></script>
     <script src="/javascripts/Controller.js" type="application/javascript"></script>
-    <script src="/javascripts/Listeners.js" type="application/javascript"></script>
 </body>
 </html>

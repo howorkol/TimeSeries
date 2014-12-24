@@ -44,57 +44,38 @@ h2.selected + div > div.slide_container {
 
 
 /* -------------------- 
-   FORM
+   LISTBOX
    -------------------- */
 
-form#searchBox {
-    width: 450px;
+div#listbox {
+    width: 500px;
     position: fixed;
-    top: 35%;
+    top: 10%;
     left: 15%;
-    vertical-align: middle;
-    background-color: transparent;
 }
 
-form#searchBox input {
-    font-size: 1.3em;
-    padding: 8px 15px;
-    height: 25px;
-}
-
-form#searchBox input.text {
-    width: 260px;
-    margin-right: -4px;
-    background-color: #ddd;
-}
-
-form#searchBox input.button {
-    background-color: #aaa;
-}
-
-form#searchBox input.button:hover {
-    background-color: #777;
-}
-
-form#searchBox input.button:active {
-    background-color: #444;
-}
-    
-form#searchBox span#browse {
+div#listbox .sector {
     color: rgba(0, 0, 0, 0.40);
     cursor: pointer;
 }
 
-form#searchBox span#browse:hover {
+div#listbox .sector:hover {
     color: #777;
 }
 
-form#searchBox span#browse:active {
+div#listbox .sector:active {
     color: #444;
 }
 
+div#listbox ul#sector_list {
+    list-style-type: none;
+    margin-top: 25px;
+    padding: 5px;
+    font-size: 1.6em;
+}
+
 /* -------------------- 
-   END FORM
+   END LISTBOX
    -------------------- */
 
 

@@ -25,7 +25,7 @@ div#charts .axis.x {
     stroke-width: 2.5px;
 }
 
-.line.deselected {
+.deselected {
     opacity: 0.1;
 }
 

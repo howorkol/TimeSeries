@@ -1,9 +1,6 @@
 var chart_height;
-
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 var clicked_companies = [];
-
-var timeout;
 var disable_slides = true;
 
 $('#accordion_cont').liteAccordion({
@@ -27,7 +24,7 @@ d3.json('/query/sectors', function(err, data) {
         sector_list.push(d.sector);
     });
 
-    d3.select('#listbox')
+    d3.select('ul#sector_list')
         .selectAll('li.sector').data(sector_list)
         .enter().append('li')
         .attr('class', 'sector')
@@ -37,11 +34,11 @@ d3.json('/query/sectors', function(err, data) {
         });
 });
 
-$('form#searchBox span#browse').click(function() {
+$('div#listbox span#browse').click(function() {
     new_sector('All');
 });
 
-function new_sector(industry) {
+function new_sector(sector) {
     $('div#visualizations ul svg').remove();
     $('h3.company_label').remove();
     $('#company_table tbody tr').remove();
@@ -49,14 +46,14 @@ function new_sector(industry) {
     model = new Model();
     selected_company = null;
 
-    add_industry(industry, function(err) {
+    add_sector(sector, function(err) {
         if (err) {
-            console.log('No data for ' + industry);
+            console.log('No data for ' + sector);
             return false;
         }
 
         disable_slides = false;
-        $('h1.industry_name').text(industry);
+        $('h1.industry_name').text(sector);
         $('ol li:nth-child(2) span').click();
     });
 }
@@ -65,7 +62,7 @@ $('span.slide_title').click(function() {
     if (disable_slides === true) { return false; }
 });
 
-function add_industry(sector, callback) {
+function add_sector(sector, callback) {
     d3.json('/query/sector/' + sector, function(err, data) {
         if (err) return callback(err);
         update_company_table(data);
@@ -94,24 +91,24 @@ function add_company(company, callback) {
                 return {'Date': d[0], 'Close': d[4], 'Volume': d[5]};
             });
         }
-//        console.log(data);
+
         model.add_quandl_data(company, data);
         if (++success === 2) return callback(null);
-        
     });
 }
 
 function click_company(company) {
+    company = company.replace('.', '\\.');
     if (clicked_companies.indexOf(company) === -1) {
         clicked_companies.push(company);
-        d3.selectAll('g.chart path#' + company.replace('.', '\\.'))
-            .classed('deselected', true)
+        d3.select('h3#' + company).classed('deselected', true);
+        d3.selectAll('g.chart path#' + company).classed('deselected', true)
             .moveToFront();
     } else {
         var index = clicked_companies.indexOf(company);
         clicked_companies.splice(index, 1);
-        d3.selectAll('g.chart path#' + company.replace('.', '\\.'))
-            .classed('deselected', false);
+        d3.select('h3#' + company).classed('deselected', false);
+        d3.selectAll('g.chart path#' + company).classed('deselected', false);
     }
 }
 
