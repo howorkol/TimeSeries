@@ -26,7 +26,7 @@ div#charts .axis.x {
 }
 
 .deselected {
-    opacity: 0.1;
+    opacity: 0.15;
 }
 
 .brush .extent {

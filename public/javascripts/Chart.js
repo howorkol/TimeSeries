@@ -9,7 +9,7 @@ var Chart = function(attribute) {
 };
 
 Chart.prototype.min_chart_height = 150;
-Chart.prototype.x = d3.time.scale();
+//Chart.prototype.x = d3.time.scale();
 Chart.prototype.width;
 Chart.prototype.height;
 Chart.prototype.transition_dur = 500;
@@ -35,7 +35,7 @@ Chart.prototype.make_chart = function() {
     var chart_width = this.width - margin.left - margin.right;
     var attribute = this.attribute;
     var xLine;
-    var x;
+    //var x = this.x;
     
     var cursor_out = function() {
         d3.selectAll('line.xLine').style('opacity', 0);
@@ -53,7 +53,7 @@ Chart.prototype.make_chart = function() {
                 mouseout();
                 return;
             }
-            
+
             var x0 = x.invert(x_coor);
             var hovered_data = model.getClosestValues(attribute, x0);
 
@@ -98,7 +98,8 @@ Chart.prototype.make_chart = function() {
         .attr('id', this.attribute)
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    x = this.x.range([1, chart_width]);
+    var x = this.x = d3.time.scale()
+        .range([1, chart_width]);
     
     // Grab and set the y domain and range. The domain depends on the 
     // data for this attribute, range depends on chart height.
@@ -146,12 +147,22 @@ Chart.prototype.make_chart = function() {
         //.attr('transform', 'translate(' + margin.left + ',0)');
 
     function formatTicks(d) {
-        if (d == 0) return '0';
-        else if (d < 1) return d3.format('.2f')(d);
-        else if (d < 10) return d3.format('.1f')(d);
-        else if (d < 1000) return d3.format('d')(d);
-        else if (d < 1e6) return d3.format('d')(d / 1e3) + 'K';
-        else return d3.format('d')(d / 1e6) + 'M';
+        if (d === 0) return '0';
+        if (d < 1) return d3.format('.2f')(d);
+        
+        var i = 0;
+        var letters = ['', 'K', 'M', 'B'];
+        var format;
+
+        while (d >= 1000) {
+            d /= 1000;
+            i++;
+        }
+
+        if (d < 10) format = '.1f';
+        else format = '.0f';
+
+        return d3.format(format)(d) + letters[i];
     }
     
     this.chart_group.append('text')
@@ -159,20 +170,19 @@ Chart.prototype.make_chart = function() {
         .attr('font-size', '.9em')
         .attr('transform', 'translate(' + (chart_width - 6) + ', 20)')
         .attr('text-anchor', 'end');
-    
-    //this.update_chart();
 }
 
 Chart.prototype.update_chart = function() {
     var chart_height = this.height - margin.top  - margin.bottom;
     var chart_width  = this.width  - margin.left - margin.right;
     var line = this.line;
+    //var attribute = this.attribute;
 
     // Set the chart domain and range as it may have changed. 
     /*this.x.domain(brush.empty() 
             ? model.date_range() 
             : brush.extent());*/
-    this.x.domain(model.date_range());
+    this.x.domain(model.date_range(this.attribute));
     this.y.domain(model.value_range(this.attribute))
         .range([chart_height, 25]).nice();
     

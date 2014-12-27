@@ -110,6 +110,7 @@ function click_company(company) {
         d3.select('h3#' + company).classed('deselected', false);
         d3.selectAll('g.chart path#' + company).classed('deselected', false);
     }
+    model.update_charts();
 }
 
 function delete_company(company_name, callback) {

@@ -230,26 +230,29 @@ Model.prototype.chart_hover = function(x0) {
     Returns an array corresponding to [min, max] in terms of dates we have
     data for. min is the farthest date in the past, max the most recent date.
 */
-Model.prototype.date_range = function() {
+Model.prototype.date_range = function(attribute) {
     // Since the x domain of all charts should be equal, return [min, max]
     // of the dates from all datasets.
     var min, max;
     
-    for (var attribute in this.data) {
+    //for (var attribute in this.data) {
         for (var i = 0; i < this.data[attribute].length; i++) {
-            if (!this.data[attribute][i]) continue;
-            var local_min = d3.min(this.data[attribute][i]['values'], 
-                    function(d) {
+            var data = this.data[attribute][i];
+            if ((!data) || (clicked_companies.indexOf(data.company) > -1))
+                continue;
+
+            var local_min = d3.min(data['values'], function(d) {
                 if (d['value'] !== null) return d['date'];
             });
-            var local_max = d3.max(this.data[attribute][i]['values'], 
-                    function(d) {
+            var local_max = d3.max(data['values'], function(d) {
                 if (d['value'] !== null) return d['date'];
             });
+
             if ((min == undefined) || (local_min < min)) min = local_min;
             if ((max == undefined) || (local_max > max)) max = local_max;
         }
-    }
+    //}
+
     if ((min !== undefined) && (max !== undefined)) return [min, max];
     else return [null, null];
 }
@@ -265,13 +268,14 @@ Model.prototype.value_range = function(attribute) {
     var min, max;
     
     for (var i = 0; i < this.company_list.length; i++) {
-        var curr_company = this.company_list[i];
-        if (!this.data[attribute][i]) continue;
+        var data = this.data[attribute][i];
+        if ((!data) || (clicked_companies.indexOf(data.company) > -1)) 
+            continue;
 
-        var local_min = d3.min(this.data[attribute][i]['values'], function(d) {
+        var local_min = d3.min(data['values'], function(d) {
             if (d['value'] !== null) return d['value'];
         });
-        var local_max = d3.max(this.data[attribute][i]['values'], function(d) {
+        var local_max = d3.max(data['values'], function(d) {
             if (d['value'] !== null) return d['value'];
         });
 
