@@ -141,8 +141,8 @@ Chart.prototype.make_chart = function() {
     
     xLine = this.chart_group.append('line')
         .attr('class', 'xLine hidden')
-        .attr('y1', 28)
-        .attr('y2', chart_height + 3);;
+        .attr('y1', 25)
+        .attr('y2', chart_height);;
         //.attr('transform', 'translate(' + margin.left + ',0)');
 
     function formatTicks(d) {
