@@ -73,12 +73,13 @@ function add_sector(sector, callback) {
 function add_company(company, callback) {
     var success = 0;
     company = company.toUpperCase();
-    model.add_company(company);
+    var quandl_data;
+    var db_data;
     
     d3.json('/query/company/' + company, function(err, data) {
         if (err) return callback(err);
-        model.add_db_data(company, data);
-        if (++success === 2) return callback(null);
+        db_data = data;
+        if (++success === 2) done();
     });
 
     query = 'https://www.quandl.com/api/v1/datasets/WIKI/' + company +
@@ -91,10 +92,16 @@ function add_company(company, callback) {
                 return {'Date': d[0], 'Close': d[4], 'Volume': d[5]};
             });
         }
-
-        model.add_quandl_data(company, data);
-        if (++success === 2) return callback(null);
+        quandl_data = data;
+        if (++success === 2) done();
     });
+
+    function done() {
+        model.add_company(company);
+        model.add_db_data(company, db_data);
+        model.add_quandl_data(company, quandl_data);
+        return callback(null);
+    }
 }
 
 function click_company(company) {
