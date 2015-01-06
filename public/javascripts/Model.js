@@ -148,12 +148,20 @@ Model.prototype.add_quandl_data = function(company_name, new_data) {
     var attribute_list = this.attribute_list;
     for (var i = 0; i < 2; i++) {
         // Add Close and Volume
+        var values;
+        if (new_data) {
+            values = new_data.map(function(d) {
+                return { 'date': parseDate(d['Date']), 'value': d[attribute_list[i + 2]] };
+            });
+        }
+      
         this.data[attribute_list[i + 2]][this.company_list.length - 1] = {
             'company': company_name,
             'color'  : this.get_color(company_name),
-            'values' : new_data.map(function(d) {
+            'values' : values
+              /*new_data.map(function(d) {
                 return { 'date': parseDate(d['Date']), 'value': d[attribute_list[i + 2]] };
-            })
+            })*/
         }
     }
 }
@@ -235,23 +243,23 @@ Model.prototype.date_range = function(attribute) {
     // of the dates from all datasets.
     var min, max;
     
-    //for (var attribute in this.data) {
-        for (var i = 0; i < this.data[attribute].length; i++) {
-            var data = this.data[attribute][i];
-            if ((!data) || (clicked_companies.indexOf(data.company) > -1))
-                continue;
+    for (var i = 0; i < this.data[attribute].length; i++) {
+        var data = this.data[attribute][i];
+            
+        if ((!data['values']) || (clicked_companies.indexOf(data.company) > -1))
+            continue;
 
-            var local_min = d3.min(data['values'], function(d) {
-                if (d['value'] !== null) return d['date'];
-            });
-            var local_max = d3.max(data['values'], function(d) {
-                if (d['value'] !== null) return d['date'];
-            });
+        var local_min = d3.min(data['values'], function(d) {
+            if (d['value'] !== null) return d['date'];
+        });
+        var local_max = d3.max(data['values'], function(d) {
+            if (d['value'] !== null) return d['date'];
+        });
 
-            if ((min == undefined) || (local_min < min)) min = local_min;
-            if ((max == undefined) || (local_max > max)) max = local_max;
-        }
-    //}
+        if ((min == undefined) || (local_min < min)) min = local_min;
+        if ((max == undefined) || (local_max > max)) max = local_max;
+    }
+
 
     if ((min !== undefined) && (max !== undefined)) return [min, max];
     else return [null, null];
@@ -269,7 +277,7 @@ Model.prototype.value_range = function(attribute) {
     
     for (var i = 0; i < this.company_list.length; i++) {
         var data = this.data[attribute][i];
-        if ((!data) || (clicked_companies.indexOf(data.company) > -1)) 
+        if ((!data['values']) || (clicked_companies.indexOf(data.company) > -1)) 
             continue;
 
         var local_min = d3.min(data['values'], function(d) {
@@ -301,6 +309,8 @@ Model.prototype.getClosestValues = function(attribute, date) {
     for (var i = 0; i < this.data[attribute].length; i++) {
         var company = this.data[attribute][i];
         var value = null;
+        if (company['values'] == undefined) continue;
+
         for (var j = 0; j < company.values.length; j++) {
             // This company doesn't have data for this date.
             if (company.values[j]['date'] > closest_date) break;

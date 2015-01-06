@@ -196,7 +196,7 @@ Chart.prototype.update_chart = function() {
     
     enter.append('path').attr('class', 'line')
         .attr('id', function(d) { return d.company; })
-        .attr('d', function(d) { return line(d.values); })
+        .attr('d', function(d) { if (d['values']) return line(d.values); })
         .attr('stroke', function(d) { return d.color; })
         .attr('stroke-opacity', 0);
     
@@ -215,7 +215,7 @@ Chart.prototype.update_chart = function() {
     // Applied to all lines.
     companies.selectAll('path')
         .transition().duration(500)
-        .attr('d', function(d) { return line(d.values); })
+        .attr('d', function(d) { if (d['values']) return line(d.values); })
         .attr('stroke-opacity', 1);
     companies.selectAll('.yValue_group')
         .transition().duration(500)
