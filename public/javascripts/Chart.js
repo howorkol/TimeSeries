@@ -1,41 +1,30 @@
 var chart_container = 'div#visualizations div#charts ul';
 var margin = {top: 3, right: 1, bottom: 15, left: 65, s_bottom: 20};
 
+/*
+ * Constructor
+ */
 var Chart = function(attribute) {
     this.attribute = attribute;
-    this.svg = d3.select(chart_container).append('svg');
     this.set_height();
     this.make_chart();
 };
 
 Chart.prototype.min_chart_height = 150;
-//Chart.prototype.x = d3.time.scale();
 Chart.prototype.width;
 Chart.prototype.height;
 Chart.prototype.transition_dur = 500;
 
-Chart.prototype.set_hover_values = function(x0) {
-     for (var i = 0; i < model.get_num_companies(); i++) {
-        var curr_company = model.get_company_by_index(i);
-        console.log(curr_company);
-        this.svg.select('g#' + curr_company.replace('.', '\.') + ' .yValue')
-            .text(model.getYatX(this.attribute, curr_company, x0));
-    }
-}
-
 /*
-    Create a new chart and add it to the page.
-    The new chart will be created with the correct height as well as 
-    display the same domain of values that is set by the slider.
-*/
+ * Create an empty chart for this.attribute.
+ * The lines and axis are not drawn because the data may not exist yet.
+ */
 Chart.prototype.make_chart = function() {
-    // Get the width and height that the new chart will take. 
     this.width = $(chart_container).width();
     var chart_height = this.height - margin.top - margin.bottom;
     var chart_width = this.width - margin.left - margin.right;
     var attribute = this.attribute;
     var xLine;
-    //var x = this.x;
     
     var cursor_out = function() {
         d3.selectAll('line.xLine').style('opacity', 0);
@@ -43,38 +32,45 @@ Chart.prototype.make_chart = function() {
     }
     
     // Create the svg element to hold everything.
-    this.svg.attr('width',  $(chart_container).width())
+    this.svg = d3.select(chart_container).append('svg')
+        .attr('width',  $(chart_container).width())
         .attr('height', this.height)
-        .on('mousemove', function() {
-            var x_coor = d3.mouse(this)[0] - margin.left - 1;
-            var y_coor = d3.mouse(this)[1] - margin.top - 27;
-            if ((x_coor < 0) || (x_coor > chart_width) || 
-                    (y_coor < 0) || (y_coor > chart_height)) {
-                mouseout();
-                return;
-            }
-
-            var x0 = x.invert(x_coor);
-            var hovered_data = model.getClosestValues(attribute, x0);
-
-            d3.select('g#' + attribute + ' text#xDate')
-                .text(d3.time.format('%b %e %Y')(hovered_data.closest_date));
-
-            for (company in hovered_data.values) {
-                d3.select('g#' + attribute + ' .yValue_group#' + 
-                          company.replace('.', '\\.') + ' .yValue')
-                    .text(function() {
-                        if (hovered_data.values[company] === null) return '';
-                        return d3.format('.3r')(hovered_data.values[company]);
-                    });
-            }
-            
-            xLine.classed('hidden', false)
-                .attr('transform', 'translate(' + 
-                      (x(hovered_data.closest_date)) + ',0)');
-        })
+        .on('mousemove', mousemove)
         .on('mouseout', mouseout);
     
+    function mousemove() {
+        var x_coor = d3.mouse(this)[0] - margin.left - 1;
+        var y_coor = d3.mouse(this)[1] - margin.top - 27;
+        
+        // If the cursor is outside the chart bounds, mouseout.
+        if ((x_coor < 0) || (x_coor > chart_width) || 
+                (y_coor < 0) || (y_coor > chart_height)) {
+            mouseout();
+            return;
+        }
+
+        // Invert the x_coor to get the date from the coordinate
+        var x0 = x.invert(x_coor);
+        var hovered_data = model.getClosestValues(attribute, x0);
+
+        d3.select('g#' + attribute + ' text#xDate')
+            .text(d3.time.format('%b %e %Y')(hovered_data.closest_date));
+
+        for (company in hovered_data.values) {
+            d3.select('g#' + attribute + ' .yValue_group#' + 
+                      company.replace('.', '\\.') + ' .yValue')
+                .text(function() {
+                    if (hovered_data.values[company] === null) return '';
+                    return d3.format('.3r')(hovered_data.values[company]);
+                });
+        }
+
+        // Set the vertical xLine to the correct coordinates
+        xLine.classed('hidden', false)
+            .attr('transform', 'translate(' + 
+                  (x(hovered_data.closest_date)) + ',0)');
+    }
+        
     function mouseout() {
         d3.selectAll('text#xDate').text('');
         d3.selectAll('g#' + attribute + ' .yValue_group .yValue')
@@ -172,16 +168,15 @@ Chart.prototype.make_chart = function() {
         .attr('text-anchor', 'end');
 }
 
+/*
+ * Update the chart. 
+ * The x and y axis are updated based on current data. Lines are added/removed
+ */
 Chart.prototype.update_chart = function() {
     var chart_height = this.height - margin.top  - margin.bottom;
     var chart_width  = this.width  - margin.left - margin.right;
     var line = this.line;
-    //var attribute = this.attribute;
-
-    // Set the chart domain and range as it may have changed. 
-    /*this.x.domain(brush.empty() 
-            ? model.date_range() 
-            : brush.extent());*/
+    
     this.x.domain(model.date_range(this.attribute));
     this.y.domain(model.value_range(this.attribute))
         .range([chart_height, 25]).nice();
@@ -190,16 +185,19 @@ Chart.prototype.update_chart = function() {
         .data(model.data[this.attribute], function(d) {
             return d.company;
         });
+    
     // Enter the data. Applies to newly added lines.
     var enter = companies.enter()
         .append('g').attr('class', 'company');
     
+    // Append a line on the chart for the new data
     enter.append('path').attr('class', 'line')
         .attr('id', function(d) { return d.company; })
         .attr('d', function(d) { if (d['values']) return line(d.values); })
         .attr('stroke', function(d) { return d.color; })
         .attr('stroke-opacity', 0);
     
+    // Append a new ticker for the new companies to the chart
     var yValue_group = enter.append('g').attr('class', 'yValue_group')
         .attr('id', function(d) { return d.company; })
         .attr('fill', function(d) { return d.color; })
@@ -242,48 +240,13 @@ Chart.prototype.update_chart = function() {
              (((-chart_height) / 2) - 12) + ', -65)');
 }
 
-Chart.prototype.quick_update = function() {
-    var line = this.line;
-    this.x.domain(brush.empty() 
-            ? model.date_range() 
-            : brush.extent());
-    
-    this.line_group.selectAll('g.company path')
-        .attr('d', function(d) { return line(d.values); });
-    this.chart_group.select(".x.axis")
-        .call(this.xAxis);
-}
-
 /*
-    Update the height of all charts. This function is called when a
-    chart is added or removed to allow dynamic chart sizes.
-*/
-Chart.prototype.update_chart_height = function() {
-    // Get and set the y range to reflect the new height.
-    var y = this.y.range([this.height - margin.top - margin.bottom, 25]).nice();
-    var x = this.x;
-    var line = this.line;
-    
-    // Update the svg height.
-    this.svg.transition().duration(this.transition_dur)
-        .attr('height', this.height);
-    // Update the clip path height.
-    this.svg.select('defs rect')
-        .transition().duration(this.transition_dur)
-        .attr('height', this.height - margin.bottom);
-    // Update xLine
-    this.svg.select('line.xLine')
-        .transition().duration(this.transition_dur)
-        .attr('y2', this.height - margin.top - margin.bottom - 25);
-};
-
-/*
-    Sets the height of the Chart prototype variable. Since all charts
-    have the same height, they all use the same shared variable.
+ * Sets the height of the Chart prototype variable. Since all charts
+ * have the same height, they all use the same shared variable.
 */
 Chart.prototype.set_height = function() {
     var total_height = $('div#visualizations div#charts').height();
-    Chart.prototype.height = ((total_height / 2/*model.get_num_attributes()*/) > this.min_chart_height)
-            ? (total_height / 2/*model.get_num_attributes()*/) - 7
+    Chart.prototype.height = ((total_height / 3) > this.min_chart_height)
+            ? (total_height / 3) - 7
             : this.min_chart_height;
 };
