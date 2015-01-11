@@ -16,11 +16,14 @@ var Model = function() {
     ];
     this.used_colors = {};
     $('div#slider svg').remove();
-    
+
     this.data = {};
-    
+
     this.add_attribute('dividendspaid');
     this.add_attribute('percentchange');
+    this.add_attribute('Open');
+    this.add_attribute('High');
+    this.add_attribute('Low');
     this.add_attribute('Close');
     this.add_attribute('Volume');
 }
@@ -86,7 +89,7 @@ Model.prototype.add_chart = function(attribute_name, chart) {
 Model.prototype.add_attribute = function(attribute_name, new_data) {
     this.attribute_list.push(attribute_name);
     this.data[attribute_name] = [];
-    
+
     if (new_data) {
         for (var i = 0; i < this.company_list.length; i++) {
             this.data[attribute_name][i] = {
@@ -98,7 +101,7 @@ Model.prototype.add_attribute = function(attribute_name, new_data) {
             }
         }
     }
-    
+
     this.add_chart(attribute_name);
 }
 
@@ -109,11 +112,11 @@ Model.prototype.add_attribute = function(attribute_name, new_data) {
 Model.prototype.delete_attribute = function(attribute_name) {
     var i = this.attribute_list.indexOf(attribute_name);
     this.attribute_list.splice(i, 1);
-    
+
     // Delete the data for that attribute, as well as the chart.
     delete this.charts[attribute_name];
     delete this.data[attribute_name]
-    
+
     this.update_chart_heights();
     this.update_charts();
 }
@@ -146,22 +149,19 @@ Model.prototype.add_db_data = function(company_name, new_data, all_companies) {
 
 Model.prototype.add_quandl_data = function(company_name, new_data) {
     var attribute_list = this.attribute_list;
-    for (var i = 0; i < 2; i++) {
-        // Add Close and Volume
+    for (var i = 2; i < this.attribute_list.length; i++) {
+        // Add Open, High, Low, Close, and Volume
         var values;
         if (new_data) {
             values = new_data.map(function(d) {
-                return { 'date': parseDate(d['Date']), 'value': d[attribute_list[i + 2]] };
+                return { 'date': parseDate(d['Date']), 'value': d[attribute_list[i]] };
             });
         }
-      
-        this.data[attribute_list[i + 2]][this.company_list.length - 1] = {
+
+        this.data[attribute_list[i]][this.company_list.length - 1] = {
             'company': company_name,
             'color'  : this.get_color(company_name),
             'values' : values
-              /*new_data.map(function(d) {
-                return { 'date': parseDate(d['Date']), 'value': d[attribute_list[i + 2]] };
-            })*/
         }
     }
 }
@@ -205,33 +205,33 @@ Model.prototype.update_charts = function() {
     update_chart_heights
     Recalculates the new chart height.
     Go through all charts and call update_chart_height on each.
-*/
+*//*
 Model.prototype.update_chart_heights = function() {
     Chart.prototype.set_height();
     for (chart in this.charts) {
         this.charts[chart].update_chart_height();
     }
-}
+}*/
 
 /*
     slider_event
     Go through all charts and call quick_update on each.
-*/
+*//*
 Model.prototype.slider_event = function() {
     for (chart in this.charts) {
         this.charts[chart].quick_update();
     }
-}
+}*/
 
 /* 
     chart_hover
     Go through all charts and call set_hover_values on each.
-*/
+*//*
 Model.prototype.chart_hover = function(x0) {
     for (chart in this.charts) {
         this.charts[chart].set_hover_values(x0);
     }
-}
+}*/
 
 /*
     date_range

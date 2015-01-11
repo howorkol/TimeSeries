@@ -59,7 +59,7 @@ function new_sector(sector) {
             console.log('No data for ' + sector);
             return false;
         }
-        
+
         // Set the company table to hold the new list of companies
         // and switch slides to the table.
         update_company_table(data);
@@ -88,7 +88,7 @@ function add_company(company, callback) {
     var quandl_data;
     var db_data;
     company = company.toUpperCase();
-    
+
     // Query the local db for dividends paid and % change
     d3.json('/query/company/' + company, function(err, data) {
         if (err) return callback(err);
@@ -100,9 +100,16 @@ function add_company(company, callback) {
     d3.json(query_part[0] + company + query_part[1], function(err, data) {
         if (err) console.log('No data for ' + company + ' from Quandl.');
         else data = data.data.reverse().map(function(d) {
-                return {'Date': d[0], 'Close': d[4], 'Volume': d[5]};
-            });
-        
+                return {
+                  'Date':   d[0],
+                  'Open':   d[1],
+                  'High':   d[2],
+                  'Low':    d[3],
+                  'Close':  d[4],
+                  'Volume': d[5]};
+                }
+            );
+
         quandl_data = data;
         if (++success === 2) done();
     });
